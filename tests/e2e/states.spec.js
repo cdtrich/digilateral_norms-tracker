@@ -161,6 +161,16 @@ test('clicked dot gets the black ring; tooltip last line says selected / linked 
   await expect(tip.locator('.tooltip__status')).toHaveText('Not linked');
   await expect(other).toHaveAttribute('aria-label', /Not linked.$/);
 
+  // clicking another dot of the same item moves the ring (and keeps focus on that dot)
+  await enisa.nth(0).click();
+  await expect(enisa.nth(0)).toHaveClass(/is-selected/);
+  await expect(enisa.nth(0)).toBeFocused();
+  await expect(page.locator('button.dot.is-selected')).toHaveCount(1);
+  await enisa.nth(0).hover();
+  await expect(tip.locator('.tooltip__status')).toHaveText('Selected');
+  await enisa.nth(3).click();
+  await expect(enisa.nth(3)).toHaveClass(/is-selected/);
+
   // with a filter: match status, “· selected” on the clicked dot, thin ring on the item’s other dots
   await page.locator('#f-type').selectOption('Institutions');
   await expect(enisa.nth(3)).toHaveClass(/is-selected/);
