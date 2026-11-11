@@ -127,9 +127,9 @@ test('5.4 matrix cell: primary count, secondary count, hit from status', () => {
   const cols = ['Incident manager', 'Diplomat'];
   const matcher = createMatcher({ job: 'Diplomat' });
   const cells = matrixCells(m.links, m.norms, cols, 'job', matcher);
-  assert.deepEqual(cells.get('A').get('Diplomat'), { primary: 1, secondary: 1, hit: true });
-  assert.deepEqual(cells.get('A').get('Incident manager'), { primary: 1, secondary: 0, hit: true });
-  assert.deepEqual(cells.get('C').get('Incident manager'), { primary: 0, secondary: 1, hit: false });
+  assert.deepEqual(cells.get('A').get('Diplomat'), { primary: 1, secondary: 1, hit: true, hitLevel: 'full' });
+  assert.deepEqual(cells.get('A').get('Incident manager'), { primary: 1, secondary: 0, hit: true, hitLevel: 'partial' });
+  assert.deepEqual(cells.get('C').get('Incident manager'), { primary: 0, secondary: 1, hit: false, hitLevel: null });
 });
 
 test('5.4 panel: links, distinct norms, per-norm counts ordered by count then letter', () => {

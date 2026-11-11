@@ -89,3 +89,15 @@ export function searchEntities(entities, q) {
   if (ids.length === 1) return { query, mode: 'single', exact: false, selected: ids[0], matches: ids, others: [], commission };
   return { query, mode: 'list', exact: false, selected: null, matches: ids, others: [], commission };
 }
+
+/**
+ * Search with the “show all mentions” switch: when `all` is set and an exact hit has other mentions,
+ * list mode shows the exact hit and the other mentions together (all their dots highlighted).
+ */
+export function resolveSearch(entities, q, { all = false } = {}) {
+  const r = searchEntities(entities, q);
+  if (!all || r.mode !== 'single' || r.others.length === 0) return r;
+  const byId = new Map(entities.map((e) => [e.entity_id, e]));
+  const ids = [r.selected, ...r.others].sort((a, b) => byName(byId.get(a), byId.get(b)));
+  return { ...r, mode: 'list', selected: null, matches: ids, others: [] };
+}

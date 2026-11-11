@@ -153,8 +153,9 @@ Colors (tokens): Jet `#333333`, Electric Blue `#0033FF`, White, Sunglow `#FFCC33
 |---|---|
 | `default` | Electric Blue fill |
 | `full` | Sunglow fill + 1.5px Jet outline |
-| `partial` | **Ring**: pale-blue fill with a Sunglow ring (about 3px) and thin Jet outline. Must stay distinguishable from `full` and `none` at 12 px and in greyscale (decision: ring, not hatching) |
+| `partial` | **Ring**: no fill (the background shows through), a Sunglow ring (about 3px) and thin Jet outline (owner decision 2026-11-11: no pale-blue fill). Must stay distinguishable from `full` and `none` at 12 px and in greyscale (decision: ring, not hatching) |
 | `none` | pale blue, no outline |
+| selected item | With no search or filter active: the item’s dots stay Electric Blue and every other dot dims to the `none` look. With a search or filter active: dots keep their match state and the item’s dots get a dark ring (owner decision 2026-11-11) |
 | hovered/focused | 2px Jet outline plus tooltip |
 
 - Yellow means "matches current search or filter" and nothing else.
@@ -216,7 +217,7 @@ Combined filters apply together (5.2). A "Clear all" control resets every criter
 ## 11. Build, test, deploy
 
 - No build step, no bundler, no `dist/`. Vanilla JS (ES modules, relative imports), plain CSS, no framework.
-- Runtime dependencies are vendored, pinned and committed with their licence files: D3 as individual modules only, as unmodified ESM sources in `vendor/<module>@<version>/` (currently `d3-dsv@3.0.1`, `d3-selection@3.0.0`). Add a library only if it clearly earns its place. Fonts are committed woff2 files in `fonts/`.
+- Runtime dependencies are vendored, pinned and committed with their licence files: D3 as individual modules only, as unmodified ESM sources in `vendor/<module>@<version>/` (currently `d3-dsv@3.0.1` only). Add a library only if it clearly earns its place. Fonts are committed woff2 files in `fonts/`.
 - Dev-only tooling via npm (Node 20+): `@playwright/test`, `@axe-core/playwright`. `node_modules/` is gitignored; nothing from npm is served to the page.
 - Local preview: `npx serve .` (any static server works; fetch does not work over `file://`). No npm install is needed to run the site.
 - Scripts: `npm run test` (node:test unit tests on the pure modules), `npm run test:e2e` (Playwright + axe), `npm run check-data` (plain Node script).

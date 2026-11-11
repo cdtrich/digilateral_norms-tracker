@@ -9,18 +9,17 @@
   <link rel="preload" href="fonts/roboto-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="src/styles/tokens.css">
   <link rel="stylesheet" href="src/styles/base.css">
+  <link rel="stylesheet" href="src/styles/components.css">
   <script type="module" src="src/main.js"></script>
 </head>
 <body>
+  <a class="skip-link" href="#main">Skip to content</a>
   <div id="data-banner" class="data-banner" role="alert" hidden>
-    <strong>Data check failed:</strong>
+    <strong></strong>
     <ul></ul>
   </div>
-  <header class="site-header">
-    <h1 class="site-title">norms tracker</h1>
-  </header>
-  <main id="app" data-state="loading">
-    <p class="placeholder">[UI not built yet. Links loaded: <span data-links>…</span>]</p>
-  </main>
+  <div id="app" data-state="loading">
+    <noscript><p>The norms tracker needs JavaScript. The data can be downloaded from the data/ folder.</p></noscript>
+  </div>
 </body>
 </html>

@@ -15,6 +15,9 @@
 
 ## Raised during setup (2026-11-11)
 
-11. **Two items share the short name “CSA”.** Cyber Solidarity Act has `short_name` “CSA (Solidarity)” and the Cybersecurity Act has “CSA (Certification)”. A search for “CSA” therefore lists both (list mode) and selects neither. Is that intended, or should one of them carry “CSA” as an alias?
-12. **Aliases include pre-cleaning misspellings** (e.g. “EU-OSCE cooperaiton”, “Network Code … ((Delegated Regulation 2024/1366)”), matching the merges in CLEANING_LOG.md. They are searchable, which is harmless. Confirm they are meant to stay as aliases.
-13. **`meta.json` is new** (`data/meta.json`, all values null). Who fills in version, date, report version, licence, citation and contact?
+11. ~~**Two items share the short name “CSA”.**~~ Resolved (owner, 2026-11-11): listing both is fine. Cyber Solidarity Act has `short_name` “CSA (Solidarity)” and the Cybersecurity Act has “CSA (Certification)”. A search for “CSA” therefore lists both (list mode) and selects neither. Is that intended, or should one of them carry “CSA” as an alias?
+12. **Aliases include pre-cleaning misspellings** (owner raises with the client; data stays as is) (e.g. “EU-OSCE cooperaiton”, “Network Code … ((Delegated Regulation 2024/1366)”), matching the merges in CLEANING_LOG.md. They are searchable, which is harmless. Confirm they are meant to stay as aliases.
+13. **`meta.json` is new** (stays null; the client fills it in) (`data/meta.json`, all values null). Who fills in version, date, report version, licence, citation and contact?
+14. **Methodology, “What it shows”** still says “Dots are grouped by topic or by job category, depending on the starting point.” Since BUILD_SPEC 12.1 the dots are always grouped by topic and the job path is a lens. Proposed wording for the authors: “Dots are always grouped by topic; choosing a job category highlights the links that matter for it.”
+15. **Report URL** for “Read the report” (header and Source section). Set `header.reportUrl` in `src/content/copy.json`.
+16. **UI microcopy to review** (functional labels written during the build, all in `copy.json`): legend lines (“Link (no search or filter)”, “Matches through a secondary topic or job”), job picker heading and count explanation, matrix “+n” explanation, “View as table”, “Escape” hint, mobile match labels, panel “Show less / Show fewer norms”.

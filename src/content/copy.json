@@ -1,0 +1,268 @@
+{
+  "_note": "UI copy. Text in [brackets] is a placeholder for the client. {tokens} are filled from the data (src/logic/aggregate.js methodologyFacts) and must never be replaced by typed numbers.",
+  "title": "norms tracker",
+  "tabs": {
+    "explore": "Explore",
+    "methodology": "Methodology"
+  },
+  "header": {
+    "readReport": "Read the report",
+    "reportUrl": null,
+    "reportUrlPlaceholder": "[link to the report]",
+    "downloadData": "Download data"
+  },
+  "intro": "[Intro text: two or three sentences on what the tracker shows and how to read it.]",
+  "opening": {
+    "heading": "What do you want to find out?",
+    "cards": [
+      {
+        "by": "topic",
+        "question": "How do the UN norms deal with specific issues?",
+        "action": "Start from topics"
+      },
+      {
+        "by": "job",
+        "question": "How are the UN norms relevant for my job?",
+        "action": "Start from job categories"
+      }
+    ],
+    "switchNote": "You can switch at any time.",
+    "hint": "One dot = one link between a norm and an EU instrument, institution or partnership. Choose a starting point on the left."
+  },
+  "controls": {
+    "exploreBy": "Explore by",
+    "topic": "Topic",
+    "job": "Job",
+    "searchLabel": "Search items or institutions",
+    "searchPlaceholder": "e.g. NIS2, ENISA",
+    "commissionHelper": "The European Commission is not coded per norm.",
+    "commissionHelperLink": "Why?",
+    "norm": "Norm",
+    "allNorms": "All norms",
+    "normType": "Norm type",
+    "allNormTypes": "All (do and don’t)",
+    "normTypeOptions": {
+      "positive": "Do (asks states to act)",
+      "prohibitive": "Don’t (asks states to refrain)"
+    },
+    "topicLabel": "Topic",
+    "allTopics": "All topics",
+    "jobLabel": "Job category",
+    "allJobs": "All jobs",
+    "typeLabel": "Type",
+    "allTypes": "All types",
+    "filterToggle": "Filter",
+    "clearAll": "Clear all"
+  },
+  "legend": {
+    "default": "Link (no search or filter)",
+    "full": "Matches search or filters",
+    "partial": "Matches through a secondary topic or job",
+    "none": "No match, or not the selected item",
+    "do": "Norm asks states to act",
+    "dont": "Norm asks states to refrain",
+    "oneDot": "One dot = one link between a norm and an item."
+  },
+  "grid": {
+    "caption": "All topics · click a block to drill into norm › type › item",
+    "allTopics": "All topics",
+    "viewAsTable": "View as table",
+    "viewAsGrid": "View as dots",
+    "linksWord": "links",
+    "tableCaption": "All links, grouped by topic. The last column shows whether a link matches the current search or filters.",
+    "tableHeaders": [
+      "Item",
+      "Type",
+      "Norm",
+      "Topic",
+      "Job category",
+      "Match"
+    ],
+    "escapeHint": "Press Escape or use the breadcrumb to go up one level.",
+    "focusEmpty": "No links in this view."
+  },
+  "jobPicker": {
+    "heading": "Choose a job category",
+    "explain": "Counts: links where it is the main job category · links where it is the main or secondary one.",
+    "notSpecifiedNote": "No job category in the source ({notSpecifiedNorms}).",
+    "clear": "Show all jobs"
+  },
+  "matrix": {
+    "headingTopic": "Norms by topic",
+    "headingJob": "Norms by job category",
+    "explain": "Number of links per cell. Clicking a cell filters the dots above.",
+    "explainJob": "“+n” counts links where the job category is secondary."
+  },
+  "panel": {
+    "close": "Close",
+    "linksAcross": "{links} {linksNoun} across {norms} of the {total} norms",
+    "stripNote": "Highlighted letters are the norms this item appears in. A dark top edge marks a don’t norm.",
+    "moreOps": "+{n} more",
+    "showLess": "Show less",
+    "showAllNorms": "Show all {n} norms",
+    "showFewerNorms": "Show fewer norms",
+    "stripLabel": "Norms this item appears in",
+    "stripOn": "appears",
+    "stripOff": "does not appear",
+    "description": "[Placeholder: short description of the item and link to the full report section]",
+    "othersMention": "{n} other {itemNoun} {verb} “{q}”",
+    "resultsHeading": "{n} items match “{q}”",
+    "empty": "No item matches “{q}”. Try a short name such as NIS2 or ENISA."
+  },
+  "commissionNote": {
+    "heading": "Why so few results for the Commission?",
+    "body": "The report does not code the European Commission or its Directorates-General per norm, because they have a stake in every norm. {commissionLinksWordCap} {commissionLinkNoun} {commissionNamesVerb} the Commission ({commissionNorms}). The other matches are legal acts and guidance with “Commission” in their title.",
+    "link": "Read more in the methodology"
+  },
+  "mobile": {
+    "back": "Back",
+    "matchOne": "match",
+    "matchMany": "matches",
+    "secondaryOne": "secondary match",
+    "secondaryMany": "secondary matches"
+  },
+  "dataBanner": "Data check failed:",
+  "methodology": {
+    "title": "Methodology",
+    "draftBanner": "Draft for review. Boxes marked “To confirm” hold points the authors should check or adapt before publication. Text in [brackets] is a placeholder.",
+    "toConfirm": "To confirm:",
+    "sections": [
+      {
+        "id": "what-it-shows",
+        "nav": "What it shows",
+        "heading": "What it shows",
+        "paragraphs": [
+          "One dot is one link between a norm, a way of putting it into practice, and an EU instrument, institution or partnership. The tracker holds {links} links across the {norms} norms and {entities} items. An item that contributes to several norms appears once for each, so it lights up in several places when selected. Dots are grouped by topic or by job category, depending on the starting point. Yellow dots match the current search or filter."
+        ]
+      },
+      {
+        "id": "source",
+        "nav": "Source",
+        "heading": "Source",
+        "paragraphs": [
+          "The content comes from the Interface study “A UN Effect? How the EU Implements the Norms of Responsible State Behavior in Cyberspace” by Patryk Pawlak and Christina Rupp (15 July 2026), whose Annex gives a tabular overview of the EU implementation activities. {reportLink}. The report calls itself a living document rather than an exhaustive mapping, and the tracker is built so the data can be updated."
+        ],
+        "confirm": "who coded the links in the dataset, when, and which version of the report they follow."
+      },
+      {
+        "id": "coding",
+        "nav": "How links are coded",
+        "heading": "How links are coded",
+        "fields": [
+          [
+            "norm_id, title",
+            "The {norms} norms ({normRange})."
+          ],
+          [
+            "orientation",
+            "Whether the norm is a commitment to act (“do”, positive) or to refrain (“don’t”, prohibitive). Norm-level."
+          ],
+          [
+            "operationalization",
+            "How the norm is put into practice, as described in the report."
+          ],
+          [
+            "entity",
+            "The EU legislation, policy, institution or partnership that contributes. Name variants are merged."
+          ],
+          [
+            "type",
+            "Legislation, Policies, Institutions or Partnerships."
+          ],
+          [
+            "topic (primary, secondary)",
+            "The issue the link addresses: {topics} topics."
+          ],
+          [
+            "job (primary, secondary)",
+            "The professional group the link matters most for: {jobsSpecified} categories, or “Not specified”."
+          ]
+        ]
+      },
+      {
+        "id": "do-dont",
+        "nav": "Do and don’t norms",
+        "heading": "Do and don’t norms",
+        "paragraphs": [
+          "The report separates positive commitments (“do’s”), such as cooperating to protect critical infrastructure, from prohibitive commitments (“don’ts”), such as refraining from damaging critical infrastructure. The tracker marks the {prohibitiveWord} prohibitive norms, {prohibitiveList}, with a DON’T tag and a dark top edge, and the other {positiveWord} with a DO tag. A filter lets users show one group only. The report finds that the EU has translated positive commitments into regional practice more readily than prohibitive ones."
+        ],
+        "confirm": "the classification of {prohibitiveList} against Figure 1 of the report, and the wording of the tags."
+      },
+      {
+        "id": "topics-jobs",
+        "nav": "Topics and job categories",
+        "heading": "Topics and job categories",
+        "paragraphs": [
+          "The {topicsWord} topics and {jobsWord} job categories are the tracker’s own classification. They do not appear in the report, which is organized by norm and by mechanism (legislation, policies, institutions and partnerships). Each link has a primary and an optional secondary topic, and a primary and an optional secondary job category. Dots are grouped by the primary value, and secondary values are shown as rings. The source has no job category for {notSpecifiedNorms} (human rights and privacy), so it shows as “Not specified”."
+        ],
+        "confirm": "how topics and job categories were assigned, by whom, and whether job categories were derived from topics. In the current data almost every norm has the same primary topic and primary job, so the two starting points give nearly the same picture."
+      },
+      {
+        "id": "counts",
+        "nav": "Counts",
+        "heading": "Counts",
+        "paragraphs": [
+          "The tracker holds {distinctOperationalizations} distinct descriptions of how norms are put into practice ({normOperationalizations} when counted once per norm). The report speaks of 55 identified internal implementation activities."
+        ],
+        "confirm": "which counting rule the report uses, and whether the data and the report refer to the same version."
+      },
+      {
+        "id": "types",
+        "nav": "Types",
+        "heading": "Types",
+        "paragraphs": [
+          "Every item has one of {typesWord} types: Legislation, Policies, Institutions or Partnerships. The report names three mechanisms and treats institutions and partnerships together. The tracker keeps them apart. Two links labelled with the combined type in the source were given the type the same item has elsewhere."
+        ],
+        "confirm": "whether to keep four types or merge institutions and partnerships as in the report."
+      },
+      {
+        "id": "commission",
+        "nav": "The European Commission",
+        "heading": "The European Commission",
+        "paragraphs": [
+          "The report does not name the European Commission or its individual Directorates-General per norm, because they have a stake in every norm. The tracker follows this. The Commission appears in {commissionLinksWord} {commissionLinkNoun} only, in {commissionNorms} (coordination of security risk assessments for critical ICT supply chains). A search for “Commission” also returns {commissionOthersWord} legal acts and guidance documents that carry the word in their title. The search page explains this whenever the term is used."
+        ],
+        "confirm": "the wording of the explanation, and whether the single Commission link should stay."
+      },
+      {
+        "id": "preparation",
+        "nav": "Data preparation",
+        "heading": "Data preparation",
+        "bullets": [
+          "100 name variants of items were merged into {entities} items (for example ENISA and its long form).",
+          "Typos, encoding errors and one inconsistent topic label were corrected.",
+          "{notSpecifiedNorms} has no job category in the source and shows as “Not specified”.",
+          "Two links labelled “Institutions and Partnerships” were assigned the type the same item has elsewhere.",
+          "The norm-level field “orientation” (positive or prohibitive) was added.",
+          "Every change is listed in the cleaning log below, and the R script that makes them is available for download."
+        ]
+      },
+      {
+        "id": "limits",
+        "nav": "Limits",
+        "heading": "Limits",
+        "bullets": [
+          "The tracker covers EU-level measures only. It does not show Member State measures or measures still under deliberation when the report was written.",
+          "It covers the report’s internal pathway only, not EU cyber capacity-building in partner countries (external pathway).",
+          "It shows that a measure aligns with a norm, not how well it is implemented. The report notes that most EU implementation is implicit: measures are rarely framed as contributions to the UN framework."
+        ],
+        "confirm": "the data cut-off date and any further limits."
+      },
+      {
+        "id": "download",
+        "nav": "Download data",
+        "heading": "Download data",
+        "paragraphs": [
+          "The data behind the tracker and the R script that prepares it, free to reuse. [Placeholder: licence and citation.]"
+        ],
+        "downloads": true
+      },
+      {
+        "id": "version",
+        "nav": "Version and contact",
+        "heading": "Version and contact",
+        "meta": true
+      }
+    ]
+  }
+}

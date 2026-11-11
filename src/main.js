@@ -1,35 +1,41 @@
-// Boot: load data, validate, build the model, mount the app.
-// The UI is not built yet; for now this proves loading and validation in the browser.
+// Boot: load copy and data, validate, build the model, mount the app.
+// Validation problems never stop the page: a visible banner lists them and the app renders what it can.
 import { fetchDataset } from './data/load.js';
 import { validateDataset, summarize } from './data/validate.js';
 import { buildModel } from './data/model.js';
+import { mountApp } from './ui/app.js';
 
-function showBanner(messages) {
+function showBanner(title, messages) {
   const el = document.getElementById('data-banner');
+  el.querySelector('strong').textContent = title;
+  el.querySelector('ul').replaceChildren(...messages.map((m) => Object.assign(document.createElement('li'), { textContent: m })));
   el.hidden = false;
-  el.querySelector('ul').replaceChildren(
-    ...messages.map((m) => Object.assign(document.createElement('li'), { textContent: m })),
-  );
 }
 
 async function boot() {
+  let copy;
   let raw;
   try {
-    raw = await fetchDataset();
+    [copy, raw] = await Promise.all([
+      fetch('src/content/copy.json').then((r) => { if (!r.ok) throw new Error(`Could not load src/content/copy.json (HTTP ${r.status})`); return r.json(); }),
+      fetchDataset(),
+    ]);
   } catch (err) {
     console.error(err);
-    showBanner([err.message]);
+    showBanner('The tracker could not load:', [err.message]);
+    document.getElementById('app').dataset.state = 'error';
     return;
   }
   const problems = validateDataset(raw);
   console.info('Data:', summarize(raw));
   if (problems.length) {
     console.error('Data check failed:', problems);
-    showBanner(problems.map((p) => p.message));
+    showBanner(copy.dataBanner, problems.map((p) => p.message));
   }
-  const model = buildModel(raw); // render what we can even when validation failed
-  document.getElementById('app').dataset.state = 'loaded';
-  document.getElementById('app').querySelector('[data-links]').textContent = String(model.links.length);
+  const model = buildModel(raw);
+  const root = document.getElementById('app');
+  mountApp({ root, model, copy });
+  root.dataset.state = 'ready';
 }
 
 boot();

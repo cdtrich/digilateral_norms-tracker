@@ -31,7 +31,7 @@ There is no build step and no `dist/`: the repo root is the site root.
 
 ## Conventions
 
-- Vanilla JS, ES modules, no framework, no bundler. D3 as individual modules only, vendored as pinned ESM sources in `vendor/<module>@<version>/` (currently `d3-dsv`, `d3-selection`) and imported by relative path. Add a library only if it clearly earns its place, and vendor it the same way.
+- Vanilla JS, ES modules, no framework, no bundler. D3 as individual modules only, vendored as pinned ESM sources in `vendor/<module>@<version>/` (currently `d3-dsv` only) and imported by relative path. Add a library only if it clearly earns its place, and vendor it the same way.
 - Matching and search logic is pure and lives in `src/logic/`; UI code only renders state. Every rule in BUILD_SPEC section 5 has a unit test.
 - One store (`src/logic/state.js`), mirrored in the URL query string. Unknown URL values are ignored and logged.
 - Presentation choices (short labels, order, colors) go in `src/config.js`; copy goes in `src/content/copy.json`. Neither is written back to data.

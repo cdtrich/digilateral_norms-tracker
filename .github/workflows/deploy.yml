@@ -21,9 +21,8 @@ jobs:
       - run: npm ci
       - run: npm run check-data   # fails the build on any data problem
       - run: npm test
-      # e2e + axe (npm run test:e2e) is added here once the UI exists:
-      # - run: npx playwright install --with-deps chromium
-      # - run: npm run test:e2e
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e   # Playwright + axe on every state in BUILD_SPEC 8
 
   deploy:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
