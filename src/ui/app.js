@@ -36,6 +36,12 @@ export function mountApp({ root, model, copy }) {
     select(entityId, trigger) {
       lastTrigger = trigger ?? document.activeElement;
       ui.selectedLink = trigger?.matches?.('button.dot') ? Number(trigger.dataset.link) : null;
+      if (store.get().item === entityId) {
+        // Another dot of the item already selected: the store does not change, so redraw to move the
+        // black ring. Focus stays on the dot (the panel shows the same item).
+        render();
+        return;
+      }
       pendingFocus = 'panel';
       store.set({ item: entityId });
     },
@@ -155,6 +161,7 @@ export function mountApp({ root, model, copy }) {
     if (v.announce !== lastLive) { live.textContent = v.announce; lastLive = v.announce; }
     syncUrl(s);
     applyFocus();
+    tooltip.refresh(); // a tooltip already open over a dot shows its new state line
   }
 
   function applyFocus() {
