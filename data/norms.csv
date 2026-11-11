@@ -1,0 +1,12 @@
+norm_id,title,label,orientation
+A,Interstate cooperation on security,Norm A: Interstate cooperation on security,positive
+B,Considering all relevant information in case of ICT incidents,Norm B: Considering all relevant information in case of ICT incidents,positive
+C,Preventing misuse of ICTs,Norm C: Preventing misuse of ICTs,prohibitive
+D,Cooperation to stop crime and terrorism,Norm D: Cooperation to stop crime and terrorism,positive
+E,Respecting human rights and privacy,Norm E: Respecting human rights and privacy,positive
+F,Not damaging critical infrastructure,Norm F: Not damaging critical infrastructure,prohibitive
+G,Protecting critical infrastructure,Norm G: Protecting critical infrastructure,positive
+H,Responding to requests for assistance,Norm H: Responding to requests for assistance,positive
+I,Ensuring supply chain security,Norm I: Ensuring supply chain security,positive
+J,Reporting ICT vulnerabilities,Norm J: Reporting ICT vulnerabilities,positive
+K,Not harming emergency response teams,Norm K: Not harming emergency response teams,prohibitive
