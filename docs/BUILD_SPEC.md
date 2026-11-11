@@ -155,7 +155,7 @@ Colors (tokens): Jet `#333333`, Electric Blue `#0033FF`, White, Sunglow `#FFCC33
 | `full` | Sunglow fill + 1.5px Jet outline |
 | `partial` | **Ring**: no fill (the background shows through), a Sunglow ring (about 3px) and thin Jet outline (owner decision 2026-11-11: no pale-blue fill). Must stay distinguishable from `full` and `none` at 12 px and in greyscale (decision: ring, not hatching) |
 | `none` | pale blue, no outline |
-| selected item | With no search or filter active: the item’s dots stay Electric Blue and every other dot dims to the `none` look. With a search or filter active: dots keep their match state and the item’s dots get a dark ring (owner decision 2026-11-11) |
+| selected item | With no search or filter active: the item’s dots stay Electric Blue and every other dot dims to the `none` look. The clicked dot gets the black ring (as on hover). With a search or filter active: dots keep their match state and the item’s other dots get a thin ring. Tooltip state line: Selected / Linked (same item) / Not linked, or the match status (owner decision 2026-11-11) |
 | hovered/focused | 2px Jet outline plus tooltip |
 
 - Yellow means "matches current search or filter" and nothing else.

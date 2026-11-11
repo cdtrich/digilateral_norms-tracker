@@ -264,5 +264,11 @@
         "meta": true
       }
     ]
+  },
+  "dot": {
+    "selected": "Selected",
+    "selectedSuffix": "selected",
+    "linked": "Linked (same item)",
+    "notLinked": "Not linked"
   }
 }

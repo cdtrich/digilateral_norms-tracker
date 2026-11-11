@@ -28,11 +28,14 @@ export function mountApp({ root, model, copy }) {
   const mobileQuery = window.matchMedia(`(max-width: ${BREAKPOINTS.mobile - 0.02}px)`);
 
   let lastTrigger = null;
+  // The clicked dot (link_id). UI-only: the URL holds the selected item, not which of its dots was clicked.
+  const ui = { selectedLink: null };
   let pendingFocus = null; // 'panel' | 'trigger' | 'block' | {methodology: id}
 
   const actions = {
     select(entityId, trigger) {
       lastTrigger = trigger ?? document.activeElement;
+      ui.selectedLink = trigger?.matches?.('button.dot') ? Number(trigger.dataset.link) : null;
       pendingFocus = 'panel';
       store.set({ item: entityId });
     },
@@ -61,7 +64,7 @@ export function mountApp({ root, model, copy }) {
     },
   };
 
-  const ctx = { model, copy, store, actions, facts };
+  const ctx = { model, copy, store, actions, facts, ui };
   const tooltip = createTooltip();
   const header = createHeader(ctx);
   const left = createLeftPanel(ctx);
@@ -111,6 +114,7 @@ export function mountApp({ root, model, copy }) {
   function render() {
     const s = store.get();
     const v = derive(model, s);
+    if (ui.selectedLink !== null && model.links.find((l) => l.link_id === ui.selectedLink)?.entity_id !== v.selectedEntity) ui.selectedLink = null;
     const mobile = mobileQuery.matches;
     const exploring = s.view === 'explore';
 

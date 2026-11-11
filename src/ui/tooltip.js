@@ -14,14 +14,14 @@ export function createTooltip() {
     if (!link) return;
     current = target;
     const ops = link.operationalization.length > MAX_OPS ? `${link.operationalization.slice(0, MAX_OPS - 1)}…` : link.operationalization;
-    const st = target.dataset.statusLabel;
+    const st = target.dataset.note;
     el.replaceChildren(
       h('strong', { class: 'tooltip__name' }, link.entity?.name ?? link.entity_id),
       h('span', { class: 'tooltip__meta' }, `${link.entity?.type ?? ''} · ${link.norm?.label ?? `Norm ${link.norm_id}`}`),
       h('span', { class: 'tooltip__ops' }, ops),
       h('span', { class: 'tooltip__meta' }, `Topic: ${shortTopic(link.topic_primary)}${link.topic_secondary ? ` (also ${shortTopic(link.topic_secondary)})` : ''}`),
       h('span', { class: 'tooltip__meta' }, `Job: ${shortJob(link.job_primary)}${link.job_secondary ? ` (also ${shortJob(link.job_secondary)})` : ''}`),
-      st ? h('span', { class: `tooltip__status tooltip__status--${target.dataset.status}` }, st) : null,
+      st ? h('span', { class: 'tooltip__status' }, st) : '',
     );
     el.hidden = false;
     const r = target.getBoundingClientRect();

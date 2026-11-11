@@ -2,8 +2,8 @@
 import { h, orientationWord } from './dom.js';
 import { shortTopic, shortJob, statusText } from '../logic/view.js';
 
-/** Full accessible label for a link’s dot. */
-export function dotLabel(link, status, selected) {
+/** Full accessible label for a link’s dot; `note` is the state line (also the tooltip’s last line). */
+export function dotLabel(link, note) {
   const e = link.entity ?? {};
   const n = link.norm ?? {};
   const parts = [
@@ -13,11 +13,11 @@ export function dotLabel(link, status, selected) {
     `Topic: ${shortTopic(link.topic_primary)}${link.topic_secondary ? `, also ${shortTopic(link.topic_secondary)}` : ''}`,
     `Job: ${shortJob(link.job_primary)}${link.job_secondary ? `, also ${shortJob(link.job_secondary)}` : ''}`,
   ];
-  const st = statusText(status);
-  if (st) parts.push(st.replace(/^./, (c) => c.toUpperCase()));
-  if (selected) parts.push('Selected');
+  if (note) parts.push(note);
   return parts.join('. ') + '.';
 }
+
+const cap = (s) => s.replace(/^./, (c) => c.toUpperCase());
 
 /** Interactive dot (a button). */
 export function dotButton(link, { onSelect } = {}) {
@@ -28,31 +28,45 @@ export function dotButton(link, { onSelect } = {}) {
 }
 
 /**
- * Update a dot. `display` is what it looks like (may be dimmed by a selection), `status` its real match
- * status (used for the label and tooltip), `ring` draws the selection ring, `selected` adds “Selected”.
+ * Update a dot. `display` is what it looks like (may be dimmed by a selection); `ring` is 'selected'
+ * (the clicked dot: black ring as on hover), 'linked' (other links of the item while a filter is on) or null;
+ * `note` is the state line for the label and tooltip ('' when there is nothing to say).
  */
-export function updateDot(el, { display, status, ring, selected }) {
+export function updateDot(el, { display, ring, note }) {
   if (el.dataset.status !== display) el.dataset.status = display;
-  el.dataset.statusLabel = statusText(status);
-  el.classList.toggle('is-selected', !!ring);
-  const label = dotLabel(el._link, status, selected);
+  el.dataset.note = note;
+  el.classList.toggle('is-selected', ring === 'selected');
+  el.classList.toggle('is-linked', ring === 'linked');
+  const label = dotLabel(el._link, note);
   if (el.getAttribute('aria-label') !== label) el.setAttribute('aria-label', label);
 }
 
-/** Display options for a link’s dot from the derived view. */
-export function dotView(link, view) {
-  const selected = link.entity_id === view.selectedEntity;
+/**
+ * Display options for a link’s dot. `selectedLink` is the link_id of the clicked dot (UI-only, not in the URL).
+ * No filter + item selected: “Selected” / “Linked (same item)” / “Not linked”.
+ * Filter on: the match status, plus “· selected” on the clicked dot. Nothing active: no note.
+ */
+export function dotView(link, view, selectedLink, copy) {
+  const sameItem = link.entity_id === view.selectedEntity;
+  const clicked = sameItem && link.link_id === selectedLink;
+  const t = copy.dot;
+  let note;
+  if (view.dimmed) note = clicked ? t.selected : sameItem ? t.linked : t.notLinked;
+  else {
+    const st = statusText(view.statusById.get(link.link_id));
+    note = [st && cap(st), clicked ? t.selectedSuffix : ''].filter(Boolean).join(' · ');
+    if (!st && clicked) note = t.selected;
+  }
   return {
     display: view.displayById.get(link.link_id),
-    status: view.statusById.get(link.link_id),
-    ring: selected && !view.dimmed,
-    selected,
+    ring: clicked ? 'selected' : sameItem && !view.dimmed ? 'linked' : null,
+    note,
   };
 }
 
 /** Decorative (non-interactive) dot, e.g. inside an item row whose button carries the label. */
 export function staticDot(status, selected) {
-  return h('span', { class: `dot dot--static${selected ? ' is-selected' : ''}`, 'data-status': status, 'aria-hidden': 'true' });
+  return h('span', { class: `dot dot--static${selected ? ' is-linked' : ''}`, 'data-status': status, 'aria-hidden': 'true' });
 }
 
 /**

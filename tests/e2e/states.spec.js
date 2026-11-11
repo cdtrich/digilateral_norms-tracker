@@ -132,8 +132,41 @@ test('selecting with no filter dims every other dot; with a filter the item gets
   // labels keep the real status: no “no match” without a filter
   await expect(page.locator('button.dot[data-status="none"]').first()).not.toHaveAttribute('aria-label', /No match/);
   await page.locator('#f-type').selectOption('Institutions');
-  await expect(page.locator('button.dot.is-selected')).toHaveCount(18);
-  await expect(page.locator('button.dot.is-selected[data-status="full"]')).toHaveCount(18);
+  await expect(page.locator('button.dot.is-linked[data-status="full"]')).toHaveCount(18);
+  await expect(page.locator('button.dot.is-selected')).toHaveCount(0); // selected from the URL: no clicked dot
+});
+
+test('clicked dot gets the black ring; tooltip last line says selected / linked / not linked', async ({ page }) => {
+  await page.goto('./?by=topic');
+  await ready(page);
+  const tip = page.locator('.tooltip');
+  const enisa = page.locator('button.dot[data-entity="european-union-agency-for-cybersecurity-enisa"]');
+  const other = page.locator('button.dot:not([data-entity="european-union-agency-for-cybersecurity-enisa"])').first();
+
+  // nothing filtered or selected: no state line, and never “null”
+  await other.hover();
+  await expect(tip).toBeVisible();
+  await expect(tip.locator('.tooltip__status')).toHaveCount(0);
+  await expect(tip).not.toContainText('null');
+
+  await enisa.nth(3).click();
+  await expect(page.locator('button.dot.is-selected')).toHaveCount(1);
+  await expect(enisa.nth(3)).toHaveClass(/is-selected/);
+  await expect(page.locator('button.dot.is-linked')).toHaveCount(0);
+  await enisa.nth(3).hover();
+  await expect(tip.locator('.tooltip__status')).toHaveText('Selected');
+  await enisa.nth(0).hover();
+  await expect(tip.locator('.tooltip__status')).toHaveText('Linked (same item)');
+  await other.hover();
+  await expect(tip.locator('.tooltip__status')).toHaveText('Not linked');
+  await expect(other).toHaveAttribute('aria-label', /Not linked.$/);
+
+  // with a filter: match status, “· selected” on the clicked dot, thin ring on the item’s other dots
+  await page.locator('#f-type').selectOption('Institutions');
+  await expect(enisa.nth(3)).toHaveClass(/is-selected/);
+  await expect(page.locator('button.dot.is-linked')).toHaveCount(17);
+  await enisa.nth(3).hover();
+  await expect(tip.locator('.tooltip__status')).toHaveText('Matches · selected');
 });
 
 test('arrow keys move within a norm group', async ({ page }) => {

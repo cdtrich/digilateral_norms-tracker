@@ -84,7 +84,7 @@ export function createDotGrid(ctx) {
   return {
     el,
     update(state, view) {
-      for (const d of dots) updateDot(d, dotView(d._link, view));
+      for (const d of dots) updateDot(d, dotView(d._link, view, ctx.ui.selectedLink, copy));
     },
     focusDotOf(entityId) {
       const d = dots.find((x) => x._link.entity_id === entityId);

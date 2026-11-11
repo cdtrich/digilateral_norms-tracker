@@ -73,7 +73,8 @@ button.filter-toggle { display: none; }
 .dot[data-status="partial"] { background: transparent; box-shadow: inset 0 0 0 1.5px var(--jet), inset 0 0 0 4.5px var(--sunglow); }
 .dot[data-status="none"] { background: var(--pale-blue); box-shadow: inset 0 0 0 1px var(--pale-blue-edge); }
 button.dot:hover, button.dot:focus-visible { outline: 2px solid var(--jet); outline-offset: 1px; }
-.dot.is-selected { outline: 2px solid var(--jet); outline-offset: 2px; }
+.dot.is-selected { outline: 2px solid var(--jet); outline-offset: 1px; } /* the clicked dot: same ring as hover */
+.dot.is-linked { outline: 1px solid var(--jet); outline-offset: 1px; } /* other links of the item while a filter is on */
 .dot--static { width: 14px; height: 14px; }
 .legend .dot--static, .opening-hint .dot--static { width: 18px; height: 18px; }
 
