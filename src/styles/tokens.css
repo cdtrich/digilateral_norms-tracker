@@ -1,0 +1,56 @@
+/* Self-hosted fonts (fonts/, licences alongside). Latin + Latin Extended subsets. */
+@font-face {
+  font-family: 'Roboto Slab';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(../../fonts/roboto-slab-latin-ext-700-normal.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Roboto Slab';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(../../fonts/roboto-slab-latin-700-normal.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(../../fonts/roboto-latin-ext-300-normal.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(../../fonts/roboto-latin-300-normal.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  /* Brand (digilateral visual guide v1.2). Light mode only in v1. */
+  --jet: #333333;
+  --electric-blue: #0033FF;
+  --white: #FFFFFF;
+  --sunglow: #FFCC33;
+  --light-sea-green: #03A6A6;
+  --red: #F51B1B; /* errors and warnings only, never data encoding */
+  --pale-blue: #B8C2FF; /* `none` dot fill (1.7:1 on white) */
+  --pale-blue-edge: #6A7EFF; /* 1px edge on `none` dots: 3.5:1 on white, 3.2:1 on --block-bg (BUILD_SPEC 10) */
+  --block-bg: #F4F6FF;
+  --block-border: #DCE1FF;
+  --rule: #D6D6D6;
+  --muted: #595959; /* 7:1 on white */
+
+  --font-display: 'Roboto Slab', Georgia, serif;
+  --font-body: 'Roboto', system-ui, sans-serif;
+
+  --dot: 18px;
+  --dot-tablet: 13px;
+  --dot-gap: 4px;
+}

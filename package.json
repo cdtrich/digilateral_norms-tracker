@@ -1,0 +1,19 @@
+{
+  "name": "norms-tracker",
+  "private": true,
+  "version": "0.1.0",
+  "description": "How the EU puts the 11 UN cyber norms into practice. Static site, no build step.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test",
+    "test:e2e": "playwright test",
+    "check-data": "node scripts/check-data.js"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.65.0"
+  }
+}
