@@ -101,3 +101,32 @@ export function resolveSearch(entities, q, { all = false } = {}) {
   const ids = [r.selected, ...r.others].sort((a, b) => byName(byId.get(a), byId.get(b)));
   return { ...r, mode: 'list', selected: null, matches: ids, others: [] };
 }
+
+/**
+ * Combobox suggestions (BUILD_SPEC 5.9): entities matched with the word-start rule, narrowed by type,
+ * grouped by type in `types` order (unknown types last), alphabetical inside a group, with a link count.
+ * An empty query lists nothing unless `all` is set (ArrowDown on an empty box opens the full list).
+ * @returns {{ total: number, groups: { type: string, items: { id, name, shortName, links }[] }[] }}
+ */
+export function suggestItems(entities, linksByEntity, q, { type = '', types = [], all = false } = {}) {
+  const tokens = tokenize(q);
+  if (tokens.length === 0 && !all) return { total: 0, groups: [] };
+  const hits = entities
+    .filter((e) => !type || e.type === type)
+    .filter((e) => {
+      if (tokens.length === 0) return true;
+      const fields = searchFields(e);
+      return tokens.every((t) => fields.some((f) => matchesWordStart(f, t)));
+    })
+    .sort(byName);
+  const order = [...types, ...new Set(hits.map((e) => e.type).filter((t) => !types.includes(t)))];
+  const groups = order
+    .map((t) => ({
+      type: t,
+      items: hits.filter((e) => e.type === t).map((e) => ({
+        id: e.entity_id, name: e.name, shortName: e.short_name, links: linksByEntity.get(e.entity_id)?.length ?? 0,
+      })),
+    }))
+    .filter((g) => g.items.length > 0);
+  return { total: hits.length, groups };
+}

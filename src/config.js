@@ -76,3 +76,24 @@ export const DOWNLOADS = Object.freeze([
 export const META_KEYS = Object.freeze(['version', 'date', 'source_report_version', 'licence', 'citation', 'contact']);
 
 export const SEARCH_DEBOUNCE_MS = 150;
+
+/** Layouts (BUILD_SPEC 8): '1' = fixed topic blocks, '2' = adaptive. The default is left out of the URL. */
+export const VIEWS = Object.freeze(['1', '2']);
+export const DEFAULT_VIEW = '2';
+
+/** View 2: at or below this many visible links, each link is shown as a card (BUILD_SPEC 5.7). Tune by eye. */
+export const CARD_THRESHOLD = 12;
+
+/**
+ * View 2 motion (BUILD_SPEC 11), in ms: leavers shrink and fade, stayers move, enterers and cards grow in.
+ * Keep the total (enterDelay + enter) at about half a second. Reduced motion: no animation at all.
+ */
+export const MOTION = Object.freeze({
+  leave: 160,
+  moveDelay: 100,
+  move: 300,
+  enterDelay: 300,
+  enter: 200,
+  mobileFade: 150,
+  easing: 'cubic-bezier(0.2, 0.7, 0.3, 1)', // ease-out
+});

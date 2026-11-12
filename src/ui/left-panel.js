@@ -2,7 +2,8 @@
 import { TYPES, ORIENTATIONS, SEARCH_DEBOUNCE_MS } from '../config.js';
 import { h } from './dom.js';
 import { orderedTopics, orderedJobs } from '../logic/view.js';
-import { renderLegend } from './legend.js';
+import { renderLegend, createLegendV2 } from './legend.js';
+import { createCombobox } from './combobox.js';
 
 export function createLeftPanel(ctx) {
   const { model, copy, store, actions } = ctx;
@@ -38,7 +39,12 @@ export function createLeftPanel(ctx) {
     h('label', { class: 'field__label', for: 'search' }, c.searchLabel),
     input,
     h('p', { class: 'small helper' }, `${c.commissionHelper} `,
-      h('a', { href: '?view=methodology#commission', onClick: (e) => { e.preventDefault(); actions.goMethodology('commission'); } }, c.commissionHelperLink)));
+      h('a', { href: '?tab=methodology#commission', onClick: (e) => { e.preventDefault(); actions.goMethodology('commission'); } }, c.commissionHelperLink)));
+
+  // View 2: “Find an item” combobox (replaces the search box) with the same helper line.
+  const combo = createCombobox(ctx);
+  combo.el.append(h('p', { class: 'small helper' }, `${c.commissionHelper} `,
+    h('a', { href: '?tab=methodology#commission', onClick: (e) => { e.preventDefault(); actions.goMethodology('commission'); } }, c.commissionHelperLink)));
 
   // Dropdowns
   const select = (key, label, allLabel, options) => {
@@ -60,23 +66,42 @@ export function createLeftPanel(ctx) {
   // Mobile: filters collapse behind a toggle; search stays visible.
   const filtersId = 'filters';
   const filterToggle = h('button', { type: 'button', class: 'btn filter-toggle', 'aria-expanded': 'false', 'aria-controls': filtersId }, c.filterToggle);
-  const filters = h('div', { class: 'filters', id: filtersId }, exploreBy, selects.map((s) => s.el), renderLegend(copy));
+  // Checkboxes: secondary matches (both views), non-matching dots (view 2 only).
+  const checkbox = (key, label) => {
+    const input = h('input', { type: 'checkbox', id: `f-${key}`, class: 'check__input' });
+    input.addEventListener('change', () => store.set({ [key]: input.checked }));
+    return { key, input, el: h('div', { class: 'check' }, input, h('label', { for: `f-${key}` }, label)) };
+  };
+  const checks = [checkbox('sec', c.includeSecondary), checkbox('non', c.showNonMatching)];
+  const legend1 = renderLegend(copy);
+  const legend2 = createLegendV2(copy);
+  const filters = h('div', { class: 'filters', id: filtersId }, exploreBy, selects.map((s) => s.el), h('div', { class: 'checks' }, checks.map((x) => x.el)), legend1, legend2.el);
   filterToggle.addEventListener('click', () => {
     const open = filterToggle.getAttribute('aria-expanded') !== 'true';
     filterToggle.setAttribute('aria-expanded', String(open));
     filters.classList.toggle('is-open', open);
   });
 
-  const controls = h('div', { class: 'controls' }, search, filterToggle, filters);
+  const controls = h('div', { class: 'controls' }, search, combo.el, filterToggle, filters);
   const el = h('aside', { class: 'left', 'aria-label': 'Explore controls' },
     h('p', { class: 'intro placeholder' }, copy.intro),
     opening,
     controls);
 
+  let view2 = false;
   return {
     el,
-    input,
+    get input() { return view2 ? combo.input : input; },
     update(state, view) {
+      view2 = view.adaptive;
+      search.hidden = view2;
+      combo.el.hidden = !view2;
+      combo.update(state);
+      checks[1].el.hidden = !view2;
+      for (const x of checks) x.input.checked = state[x.key];
+      legend1.hidden = view2;
+      legend2.el.hidden = !view2;
+      legend2.update(state, view);
       opening.hidden = !view.opening;
       controls.hidden = view.opening;
       byBtns[0].setAttribute('aria-pressed', String(state.by === 'topic'));

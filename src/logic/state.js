@@ -1,33 +1,47 @@
 // Single store, mirrored in the URL query string (BUILD_SPEC 9). Pure: no DOM, no history access here.
-import { TOPICS, JOBS, TYPES, ORIENTATIONS } from '../config.js';
+import { TOPICS, JOBS, TYPES, ORIENTATIONS, VIEWS, DEFAULT_VIEW } from '../config.js';
 
 export const DEFAULT_STATE = Object.freeze({
-  view: 'explore', // explore | methodology
+  view: DEFAULT_VIEW, // '1' fixed | '2' adaptive (BUILD_SPEC 8)
+  tab: 'explore', // explore | methodology
   by: '', // '' (opening, S0) | topic | job
   q: '',
+  item: '', // chosen entity_id: a criterion in view 2, a selection (dims the rest) in view 1
   norm: '',
   orientation: '', // positive | prohibitive
   type: '',
   topic: '',
   job: '',
-  item: '', // selected entity_id (S5)
-  block: '', // focused topic block (S6)
-  bnorm: '', // drill-down inside the focused block
+  block: '', // view 1: focused topic block (S6)
+  bnorm: '', // view 1: drill-down inside the focused block
   btype: '',
   all: false, // search: show every item that mentions the query (list mode)
+  sec: true, // include secondary matches (sec=0 in the URL when off)
+  non: false, // view 2: show non-matching dots (fixed layout, faded)
   table: false, // “View as table”
 });
 
 /** URL keys in serialisation order. */
 export const URL_KEYS = Object.freeze(Object.keys(DEFAULT_STATE));
+/** Criteria that filter dots in both views. `item` is added in view 2 (see `criteriaOf`). */
 export const CRITERIA_KEYS = Object.freeze(['q', 'norm', 'orientation', 'type', 'topic', 'job']);
-const BOOLEAN_KEYS = new Set(['all', 'table']);
+const BOOLEAN_KEYS = new Set(['all', 'sec', 'non', 'table']);
 const MAX_QUERY = 200;
+
+export const isAdaptive = (state) => state.view === '2';
+
+/** The active criteria of a state as an object (empty strings for inactive ones). */
+export function criteriaOf(state) {
+  const c = Object.fromEntries(CRITERIA_KEYS.map((k) => [k, state[k]]));
+  c.item = isAdaptive(state) ? state.item : '';
+  return c;
+}
 
 /** Allowed values per key, from the model and config. `null` = free text. */
 function allowedValues(model) {
   return {
-    view: ['explore', 'methodology'],
+    view: [...VIEWS],
+    tab: ['explore', 'methodology'],
     by: ['topic', 'job'],
     q: null,
     norm: model.norms.map((n) => n.norm_id),
@@ -55,7 +69,8 @@ export function parseQuery(search, model) {
     if (!(key in DEFAULT_STATE)) { ignored.push({ key, value: raw, reason: 'unknown parameter' }); continue; }
     if (BOOLEAN_KEYS.has(key)) {
       if (raw === '1' || raw === 'true') state[key] = true;
-      else if (raw !== '0' && raw !== 'false') ignored.push({ key, value: raw, reason: 'expected 1 or 0' });
+      else if (raw === '0' || raw === 'false') state[key] = false;
+      else ignored.push({ key, value: raw, reason: 'expected 1 or 0' });
       continue;
     }
     if (key === 'q') { state.q = raw.slice(0, MAX_QUERY); continue; }
@@ -70,8 +85,8 @@ export function serializeQuery(state) {
   const params = new URLSearchParams();
   for (const key of URL_KEYS) {
     const v = state[key];
-    if (v === DEFAULT_STATE[key] || v === '' || v == null) continue;
-    params.set(key, BOOLEAN_KEYS.has(key) ? '1' : String(v));
+    if (v === DEFAULT_STATE[key] || v == null || (v === '' && !BOOLEAN_KEYS.has(key))) continue;
+    params.set(key, BOOLEAN_KEYS.has(key) ? (v ? '1' : '0') : String(v));
   }
   const s = params.toString();
   return s ? `?${s}` : '';
@@ -83,22 +98,25 @@ export function hasCriteria(state) {
 
 /** S0: nothing chosen yet. */
 export function isOpening(state) {
-  return state.view === 'explore' && state.by === '' && !hasCriteria(state) && !state.item && !state.block;
+  return state.tab === 'explore' && state.by === '' && !hasCriteria(state) && !state.item && !state.block;
 }
 
-/** Keep the state coherent: drill-down needs its parent; anything chosen leaves the opening. */
+/** Keep the state coherent: drill-down needs its parent (view 1 only); anything chosen leaves the opening. */
 export function normalizeState(s) {
   const out = { ...s };
+  if (out.view !== '1') out.block = '';
   if (!out.block) { out.bnorm = ''; out.btype = ''; }
   if (!out.bnorm) out.btype = '';
   if (out.q.trim() === '') { out.q = ''; out.all = false; }
-  if (out.by === '' && (hasCriteria(out) || out.item || out.block || out.table)) out.by = 'topic';
+  if (out.by === '' && (hasCriteria(out) || out.item || out.block || out.table || out.non)) out.by = 'topic';
   return out;
 }
 
-/** “Clear all”: reset every criterion and the selection; keep the view and the starting point. */
+/** “Clear all”: reset every criterion and the selection; keep the layout, tab, starting point and display options. */
 export function clearAll(state) {
-  return normalizeState({ ...DEFAULT_STATE, view: state.view, by: state.by || 'topic', table: state.table });
+  return normalizeState({
+    ...DEFAULT_STATE, view: state.view, tab: state.tab, by: state.by || 'topic', table: state.table, sec: state.sec, non: state.non,
+  });
 }
 
 /** One step up in the block drill-down (Escape / breadcrumb). */

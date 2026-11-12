@@ -16,7 +16,7 @@ export function createPanel(ctx) {
     return h('div', { class: 'commission-note', role: 'note' },
       h('h3', {}, copy.commissionNote.heading),
       h('p', {}, fmt(copy.commissionNote.body, ctx.facts)),
-      h('a', { href: '?view=methodology#commission', onClick: (e) => { e.preventDefault(); actions.goMethodology('commission'); } }, copy.commissionNote.link));
+      h('a', { href: '?tab=methodology#commission', onClick: (e) => { e.preventDefault(); actions.goMethodology('commission'); } }, copy.commissionNote.link));
   }
 
   function itemView(entityId, others, view, state) {
@@ -91,7 +91,7 @@ export function createPanel(ctx) {
 
   function render(state, view, force = false) {
     last = [state, view];
-    const p = view.opening || state.view !== 'explore' ? null : view.panel;
+    const p = view.opening || state.tab !== 'explore' ? null : view.panel;
     const key = JSON.stringify([p, state.q, state.all, view.search.commission]);
     if (!force && key === lastKey) return;
     lastKey = key;

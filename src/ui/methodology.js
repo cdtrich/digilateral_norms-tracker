@@ -45,7 +45,7 @@ export function createMethodology(ctx) {
 
   return {
     el,
-    update(state) { el.hidden = state.view !== 'methodology'; },
+    update(state) { el.hidden = state.tab !== 'methodology'; },
     scrollTo(id) {
       const target = id ? el.querySelector(`#${CSS.escape(id)}`) : el.querySelector('.meth-title');
       if (!target) return;

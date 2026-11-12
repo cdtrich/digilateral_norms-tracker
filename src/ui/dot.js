@@ -59,7 +59,8 @@ export function dotView(link, view, selectedLink, copy) {
   }
   return {
     display: view.displayById.get(link.link_id),
-    ring: clicked ? 'selected' : sameItem && !view.dimmed ? 'linked' : null,
+    // View 2: the item is a filter, so every visible dot is the item’s; only the clicked dot gets a ring.
+    ring: clicked ? 'selected' : sameItem && !view.dimmed && !view.adaptive ? 'linked' : null,
     note,
   };
 }
@@ -71,11 +72,11 @@ export function staticDot(status, selected) {
 
 /**
  * Roving tabindex + arrow keys inside a container of dots (BUILD_SPEC 10).
- * Left/Right ±1, Up/Down ±rowLength, Home/End.
+ * Left/Right ±1, Up/Down ±rowLength, Home/End. `selector` picks the items (dots, or cards in view 2).
  */
-export function enableRoving(container, rowLength = 6) {
+export function enableRoving(container, rowLength = 6, selector = 'button.dot') {
   container.addEventListener('keydown', (ev) => {
-    const dots = [...container.querySelectorAll('button.dot')];
+    const dots = [...container.querySelectorAll(selector)];
     const i = dots.indexOf(document.activeElement);
     if (i === -1) return;
     const delta = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: rowLength, ArrowUp: -rowLength }[ev.key];
@@ -89,6 +90,7 @@ export function enableRoving(container, rowLength = 6) {
     dots[j].tabIndex = 0;
     dots[j].focus();
   });
-  const first = container.querySelector('button.dot');
-  if (first) first.tabIndex = 0;
+  const items = [...container.querySelectorAll(selector)];
+  for (const it of items) it.tabIndex = -1;
+  if (items[0]) items[0].tabIndex = 0;
 }

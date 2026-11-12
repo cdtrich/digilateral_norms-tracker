@@ -8,7 +8,8 @@ export function renderMatrix(ctx, state, view) {
   const mode = state.by === 'job' ? 'job' : 'topic';
   const columns = mode === 'job' ? orderedJobs(model) : orderedTopics(model);
   const short = mode === 'job' ? shortJob : shortTopic;
-  const cells = matrixCells(model.links, model.norms, columns, mode, view.active ? view.matcher : null);
+  const cells = matrixCells(model.links, model.norms, columns, mode, view.active ? view.matcher : null,
+    { secondaryHits: !(view.adaptive && mode === 'topic') });
   const heading = mode === 'job' ? copy.matrix.headingJob : copy.matrix.headingTopic;
 
   const toggle = (normId, value) => {
@@ -17,7 +18,7 @@ export function renderMatrix(ctx, state, view) {
     store.set({ norm: on ? '' : normId, [mode]: on ? '' : value });
   };
 
-  return h('section', { class: 'matrix', 'aria-labelledby': 'matrix-h' },
+  return h('section', { class: `matrix${view.adaptive ? ' matrix--adaptive' : ''}`, 'aria-labelledby': 'matrix-h' },
     h('h2', { id: 'matrix-h' }, heading),
     h('p', { class: 'small' }, copy.matrix.explain, mode === 'job' ? ` ${copy.matrix.explainJob}` : ''),
     h('div', { class: 'matrix__scroll' },

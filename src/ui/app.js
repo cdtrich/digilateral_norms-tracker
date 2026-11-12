@@ -1,7 +1,7 @@
 // App shell: builds the layout, wires the store, URL, keyboard and focus. Components only render state.
 import { BREAKPOINTS, TOPICS, JOBS, TYPES, JOB_NOT_SPECIFIED } from '../config.js';
 import { createStore, parseQuery, serializeQuery, clearAll, drillUp } from '../logic/state.js';
-import { derive, shortTopic } from '../logic/view.js';
+import { derive, shortTopic, countLine } from '../logic/view.js';
 import { methodologyFacts } from '../logic/aggregate.js';
 import { h, setChildren } from './dom.js';
 import { createHeader } from './header.js';
@@ -11,7 +11,7 @@ import { renderBlockFocus } from './block-focus.js';
 import { createJobPicker } from './job-picker.js';
 import { renderMatrix } from './matrix.js';
 import { createPanel } from './detail-panel.js';
-import { renderMobileList } from './mobile-list.js';
+import { renderMobileList, renderMobileAdaptive } from './mobile-list.js';
 import { renderLinkTable } from './link-table.js';
 import { createMethodology } from './methodology.js';
 import { createTooltip } from './tooltip.js';
@@ -61,9 +61,10 @@ export function mountApp({ root, model, copy }) {
     },
     goMethodology(sectionId = '') {
       pendingFocus = { methodology: sectionId };
-      store.set({ view: 'methodology' });
-      if (store.get().view === 'methodology' && pendingFocus) applyFocus(); // already on the tab: no re-render
+      store.set({ tab: 'methodology' });
+      if (store.get().tab === 'methodology' && pendingFocus) applyFocus(); // already on the tab: no re-render
     },
+    refresh() { render(); },
     searchEnter() {
       const v = derive(model, store.get());
       if (v.panel?.mode === 'list' && v.panel.ids.length) actions.select(v.panel.ids[0], document.getElementById('search'));
@@ -71,6 +72,8 @@ export function mountApp({ root, model, copy }) {
   };
 
   const ctx = { model, copy, store, actions, facts, ui };
+  ui.focusGridHeading = () => countHeading.focus({ preventScroll: true });
+  ui.mobileOpen = new Set(); // view 2 mobile: expanded groups (UI-only)
   const tooltip = createTooltip();
   const header = createHeader(ctx);
   const left = createLeftPanel(ctx);
@@ -85,11 +88,15 @@ export function mountApp({ root, model, copy }) {
   const chipsEl = h('div', { class: 'chips', 'aria-label': 'Active filters', role: 'group' });
   const tableToggle = h('button', { type: 'button', class: 'btn btn--small', 'aria-pressed': 'false', onClick: () => store.set({ table: !store.get().table }) });
   const topbar = h('div', { class: 'topbar' }, crumbs, h('div', { class: 'topbar__right' }, chipsEl, tableToggle));
+  // View 2 count line (BUILD_SPEC 5.6): “k of 196 links” and what the view shows.
+  const countHeading = h('h2', { class: 'count-line__heading', id: 'count-heading', tabindex: '-1' });
+  const countText = h('p', { class: 'count-line__text' });
+  const countEl = h('div', { class: 'count-line' }, countHeading, countText);
   const viewHost = h('div', { class: 'view-host' });
   const matrixHost = h('div', { class: 'matrix-host' });
   const main = h('main', { class: 'main', id: 'main' },
     h('h1', { class: 'visually-hidden' }, `${copy.title}: ${copy.tabs.explore}`),
-    hint, topbar, jobPicker.el, viewHost, matrixHost);
+    hint, topbar, countEl, jobPicker.el, viewHost, matrixHost);
   const live = h('div', { class: 'visually-hidden', 'aria-live': 'polite', role: 'status' });
   const explore = h('div', { class: 'layout' }, left.el, main, panel.el);
 
@@ -122,9 +129,11 @@ export function mountApp({ root, model, copy }) {
     const v = derive(model, s);
     if (ui.selectedLink !== null && model.links.find((l) => l.link_id === ui.selectedLink)?.entity_id !== v.selectedEntity) ui.selectedLink = null;
     const mobile = mobileQuery.matches;
-    const exploring = s.view === 'explore';
+    const exploring = s.tab === 'explore';
+    const v2 = v.adaptive;
 
-    document.body.dataset.view = s.view;
+    document.body.dataset.view = s.tab;
+    document.body.dataset.layout = v2 ? 'adaptive' : 'fixed';
     explore.hidden = !exploring;
     header.update(s);
     methodology.update(s);
@@ -137,7 +146,14 @@ export function mountApp({ root, model, copy }) {
     topbar.hidden = v.opening;
     jobPicker.el.hidden = v.opening || s.by !== 'job';
     jobPicker.update(s);
-    renderCrumbs(s);
+    crumbs.hidden = v2;
+    if (!v2) renderCrumbs(s);
+    countEl.hidden = !v2 || v.opening;
+    if (v2 && !v.opening) {
+      const line = countLine(v, copy);
+      countHeading.textContent = line.heading;
+      countText.textContent = line.text;
+    }
     renderChips(s, v);
     tableToggle.textContent = s.table ? copy.grid.viewAsGrid : copy.grid.viewAsTable;
     tableToggle.setAttribute('aria-pressed', String(s.table));
@@ -147,10 +163,13 @@ export function mountApp({ root, model, copy }) {
     let content;
     if (v.opening) content = grid.el;
     else if (s.table) content = renderLinkTable(ctx, s, v);
-    else if (mobile) content = renderMobileList(ctx, s, v);
+    else if (mobile) content = v2 ? renderMobileAdaptive(ctx, s, v) : renderMobileList(ctx, s, v);
     else if (s.block) content = renderBlockFocus(ctx, s, v);
     else content = grid.el;
-    if (viewHost.firstChild !== content || content !== grid.el) viewHost.replaceChildren(content);
+    if (viewHost.firstChild !== content || content !== grid.el) {
+      viewHost.replaceChildren(content);
+      if (v2 && mobile) grid.fade(content);
+    }
     viewHost.classList.toggle('is-faded', v.opening);
     viewHost.inert = v.opening;
     viewHost.toggleAttribute('aria-hidden', v.opening);
@@ -182,7 +201,7 @@ export function mountApp({ root, model, copy }) {
 
   function syncUrl(s) {
     const qs = serializeQuery(s);
-    const hash = s.view === 'methodology' ? location.hash : '';
+    const hash = s.tab === 'methodology' ? location.hash : '';
     const url = `${qs || location.pathname}${hash}`;
     if (url !== `${location.search || location.pathname}${location.hash}`) history.replaceState(null, '', url);
   }
@@ -195,7 +214,7 @@ export function mountApp({ root, model, copy }) {
       if (document.activeElement?.matches('button.dot')) return; // dismiss the tooltip first (WCAG 1.4.13)
     }
     const s = store.get();
-    if (s.view !== 'explore') return;
+    if (s.tab !== 'explore') return;
     const v = derive(model, s);
     if (v.panel && !v.opening) { actions.closePanel(); return; }
     if (s.block) { pendingFocus = 'block'; store.set(drillUp(s)); return; }
@@ -205,6 +224,6 @@ export function mountApp({ root, model, copy }) {
   store.subscribe(render);
   mobileQuery.addEventListener('change', render);
   render();
-  if (store.get().view === 'methodology' && location.hash) methodology.scrollTo(location.hash.slice(1));
+  if (store.get().tab === 'methodology' && location.hash) methodology.scrollTo(location.hash.slice(1));
   return { store };
 }

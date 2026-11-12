@@ -7,7 +7,9 @@ export function renderLinkTable(ctx, state, view) {
   const { model, copy, actions } = ctx;
   const topics = orderedTopics(model);
   const normOrder = model.norms.map((n) => n.norm_id);
-  const rows = [...model.links].sort((a, b) =>
+  // View 2 lists the visible links only (all of them with “Show non-matching dots”).
+  const visible = view.adaptive && !state.non ? model.links.filter((l) => view.statusById.get(l.link_id) !== 'none') : model.links;
+  const rows = [...visible].sort((a, b) =>
     topics.indexOf(a.topic_primary) - topics.indexOf(b.topic_primary) ||
     normOrder.indexOf(a.norm_id) - normOrder.indexOf(b.norm_id) ||
     compareDots(a, b));
