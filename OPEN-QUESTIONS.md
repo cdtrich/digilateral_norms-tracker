@@ -21,3 +21,11 @@
 14. **Methodology, “What it shows”** still says “Dots are grouped by topic or by job category, depending on the starting point.” Since BUILD_SPEC 12.1 the dots are always grouped by topic and the job path is a lens. Proposed wording for the authors: “Dots are always grouped by topic; choosing a job category highlights the links that matter for it.”
 15. **Report URL** for “Read the report” (header and Source section). Set `header.reportUrl` in `src/content/copy.json`.
 16. **UI microcopy to review** (functional labels written during the build, all in `copy.json`): legend lines (“Link (no search or filter)”, “Matches through a secondary topic or job”), job picker heading and count explanation, matrix “+n” explanation, “View as table”, “Escape” hint, mobile match labels, panel “Show less / Show fewer norms”.
+
+## Raised while building view 2 (2026-11-12)
+
+17. **Fresh load in view 2:** keep the opening question (S0, as the spec says), or start straight from all dots (wireframe board 1, “v2 start all dots”)?
+18. **Matrix in view 2:** cells whose links match only through a secondary topic show a ring (same as view 1). Wireframe 3 shows them grey, so only the chosen column is highlighted. Which reading is intended?
+19. **Item chip:** “Item: ENISA” (short name, as the spec says) or the full name (wireframe 5)?
+20. **New microcopy to review** (all in `copy.json`): the count line sentences (`countLine`), card labels and chips (`cards`), the combobox texts (`controls.find*`), the view 2 legend (`legendV2`), and the two checkbox labels.
+21. **Card threshold:** 12 links or fewer become cards (`CARD_THRESHOLD` in `config.js`). Check by eye once the client has tried it.

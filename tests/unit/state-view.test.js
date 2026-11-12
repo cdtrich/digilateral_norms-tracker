@@ -10,10 +10,11 @@ import { TOPICS, JOBS, TYPES, JOB_NOT_SPECIFIED } from '../../src/config.js';
 import { loadRealModel } from './helpers.js';
 
 const m = loadRealModel();
-const S = (patch) => ({ ...DEFAULT_STATE, ...patch });
+// View 1 tests: the existing behaviour (fixed layout, selection dims). View 2 has its own file.
+const S = (patch) => ({ ...DEFAULT_STATE, view: '1', ...patch });
 
 test('URL parse/serialise round-trip', () => {
-  const qs = '?view=explore&by=job&q=NIS2&norm=C&orientation=prohibitive&type=Legislation&topic=Critical+infrastructure&job=Diplomat&item=european-commission&all=1';
+  const qs = '?view=1&tab=methodology&by=job&q=NIS2&norm=C&orientation=prohibitive&type=Legislation&topic=Critical+infrastructure&job=Diplomat&item=european-commission&all=1';
   const { state, ignored } = parseQuery(qs, m);
   assert.deepEqual(ignored, []);
   assert.equal(state.job, 'Diplomat');
@@ -21,7 +22,8 @@ test('URL parse/serialise round-trip', () => {
   const again = parseQuery(serializeQuery(state), m).state;
   assert.deepEqual(again, state);
   assert.equal(serializeQuery(DEFAULT_STATE), '');
-  assert.equal(serializeQuery(S({ by: 'topic', q: 'ENISA' })), '?by=topic&q=ENISA');
+  assert.equal(serializeQuery(S({ by: 'topic', q: 'ENISA' })), '?view=1&by=topic&q=ENISA');
+  assert.equal(serializeQuery({ ...DEFAULT_STATE, by: 'topic', sec: false, non: true }), '?by=topic&sec=0&non=1');
 });
 
 test('URL: unknown keys and values are ignored and reported, never fatal', () => {
@@ -34,7 +36,7 @@ test('URL: unknown keys and values are ignored and reported, never fatal', () =>
 
 test('state normalisation: drill-down needs its parent; criteria leave the opening', () => {
   assert.equal(parseQuery('?bnorm=A&btype=Policies', m).state.bnorm, '');
-  const s = parseQuery('?block=Critical+infrastructure&btype=Policies', m).state;
+  const s = parseQuery('?view=1&block=Critical+infrastructure&btype=Policies', m).state;
   assert.equal(s.btype, '');
   assert.equal(s.by, 'topic');
   assert.ok(isOpening(DEFAULT_STATE));
@@ -42,7 +44,7 @@ test('state normalisation: drill-down needs its parent; criteria leave the openi
 });
 
 test('store: changing q resets “all”; clearAll keeps the starting point; drillUp', () => {
-  const store = createStore({ by: 'job', q: 'NIS2', all: true });
+  const store = createStore({ view: '1', by: 'job', q: 'NIS2', all: true });
   let calls = 0;
   store.subscribe(() => { calls += 1; });
   store.set({ q: 'ENISA' });

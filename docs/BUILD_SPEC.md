@@ -1,6 +1,12 @@
-# Norms tracker: build spec v1
+# Norms tracker: build spec (revision 2)
 
-Hand-off document for Claude Code. Read `CLAUDE.md` first (rules), then this file (what to build). The wireframes (5 artboards, https://claude.ai/artifact/MwbtgrVPfYj34cKESHhaEC) are the layout spec; this document overrides them wherever it says so (section 12).
+Hand-off document for Claude Code. Read `CLAUDE.md` first (rules), then this file.
+
+**Status.** The foundation (static site, data layer, `check-data`, matching logic, unit tests, deploy workflow) and the first UI (view 1, "fixed") are built. This revision adds **view 2, "adaptive"**: a second renderer mode over the same logic, where dots enter and leave and the layout follows what the user has chosen. Sections marked **[v2]** are new. Everything else is unchanged from revision 1 except where the repo already differs (static stack, `data/` path): where this file and the repo disagree about file locations or commands, the repo wins; record the difference in `DECISIONS.md` and fix this file.
+
+**Wireframes**
+- View 1 (fixed topic blocks, fading): https://claude.ai/artifact/MwbtgrVPfYj34cKESHhaEC
+- View 2 (adaptive, animated): https://claude.ai/artifact/AdtMi4HqqEUPy1n3Ctm8af (6 artboards: all dots, combobox, topic chosen, item + topic chosen, one item chosen, transitions and grouping rule). Dots, counts and texts in the wireframes are real data. Treat them as the layout spec; this document overrides them where it says so.
 
 ## 1. What this is
 
@@ -15,239 +21,239 @@ Branding: digilateral visual guide v1.2. Hosted on GitHub Pages (subdomain), als
 | What | Where | Rule |
 |---|---|---|
 | Data | `data/norms.csv`, `entities.csv`, `links.csv` | **Read-only.** The client's dataset is the truth. Never edit, "fix", merge, reassign or add rows. Report problems; do not patch them. |
-| Data provenance | `data/CLEANING_LOG.md` (byte-for-byte copy of `files/CLEANING_LOG.md`), `data/norms_tracker_data_v1.xlsx`, `data/clean_norms_data.R` | Shipped as downloads, untouched. |
-| UI copy | `src/content/copy.json` | Intro text, placeholders, explanations. Placeholders stay visibly marked until the client replaces them. |
+| Data provenance and downloads | `data/CLEANING_LOG.md`, `data/clean_norms_data.R`, `data/norms_tracker_data_v1.xlsx` | Shipped untouched. |
+| UI copy | `src/content/copy.json` | Intro text, placeholders, explanations. Placeholders stay visibly marked. |
 | UI labels (short names, ordering, colors) | `src/config.js` | Presentation only. Never written back to data. |
-| Brand | `files/visual guide_v1.2.pdf` (reference only; `files/` is gitignored, the PDF is not committed) | Colors, fonts below and in `CLAUDE.md`. |
+| Brand | `files/visual guide_v1.2.pdf` (reference only, not committed) | Colors and fonts are in `CLAUDE.md`. |
 
-Counts in the UI are always computed from the data, never typed in. Expected counts (for tests only): 196 links, 11 norms, 91 items; types Legislation 64, Partnerships 46, Policies 43, Institutions 43 (counted per link).
+Counts in the UI are always computed from the data. Expected counts (tests only): 196 links, 11 norms, 91 items; types Legislation 64, Partnerships 46, Policies 43, Institutions 43 (per link).
 
-## 3. Repo structure
+## 3. Repo structure (static site, no build step)
 
-No build step: the repo root is the site root. `index.html` loads `src/main.js` with `<script type="module">`; every import and URL is relative, so the site works at a subdomain root or under a path. The existing folders (`data/`, `files/`, `wireframes/`) stay where they are. `Claude/` is a gitignored local working folder; the committed copy of this spec is `docs/BUILD_SPEC.md`.
+The repo layout is as built; this is the shape to keep. Do not add a bundler.
 
 ```
-/
-  CLAUDE.md
-  DECISIONS.md            # seeded from section 13
-  OPEN-QUESTIONS.md       # seeded from section 14
-  README.md
-  index.html              # entry point, served as is
-  .nojekyll               # Pages serves files as they are (no Jekyll)
-  .gitattributes          # export-ignore marks dev-only paths left out of the published site
-  CNAME                   # filled by owner when the subdomain is known
-  package.json            # dev-only: scripts, Playwright, axe (node_modules/ is gitignored)
-  playwright.config.js
-  docs/
-    BUILD_SPEC.md         # this file (committed copy; `Claude/` is gitignored)
-  data/                   # READ-ONLY client files (+ meta.json, see 4.1, + downloads, see 7)
-  files/                  # gitignored reference material (brand guide, report PDF, raw files)
-  wireframes/             # exported wireframe PNGs + PDF
-  fonts/                  # self-hosted Roboto Slab 700, Roboto 300 (woff2) + licence files
-  vendor/                 # pinned D3 modules as ESM sources + LICENSE, e.g. vendor/d3-dsv@3.0.1/
-  src/
-    main.js               # boot: load data, validate, mount app
-    config.js             # labels, orders, colors, breakpoints
-    content/copy.json
-    data/
-      load.js             # fetch + parse CSV (d3-dsv), no mutation
-      validate.js         # integrity checks (4.3)
-      model.js            # build derived indexes (4.2)
-    logic/
-      match.js            # pure matching functions (section 5)
-      search.js           # pure search/ranking (5.3)
-      aggregate.js        # counts for blocks, matrix, panel
-      state.js            # single store + URL sync
-    ui/
-      app.js header.js left-panel.js opening.js job-picker.js
-      dot-grid.js block-focus.js matrix.js detail-panel.js
-      result-list.js commission-note.js methodology.js legend.js
-      mobile-list.js
-    styles/
-      tokens.css base.css components.css
-  scripts/
-    check-data.js         # plain Node script running validate.js; used in CI and `npm run check-data`
-  tests/
-    unit/                 # node:test (Node's built-in runner)
-    e2e/                  # Playwright (+ axe)
-  .github/workflows/deploy.yml
+index.html                  # entry; loads src/main.js as an ES module
+CLAUDE.md  README.md  DECISIONS.md  OPEN-QUESTIONS.md
+data/                       # READ-ONLY CSVs + downloads + meta.json
+fonts/                      # self-hosted woff2 (Roboto 300, Roboto Slab 700) + licences
+vendor/                     # pinned, unmodified D3 modules + licences (d3-dsv only; d3-selection was removed, see DECISIONS.md)
+src/
+  main.js  config.js
+  content/copy.json
+  data/    load.js validate.js model.js
+  logic/   match.js search.js aggregate.js state.js
+           view.js                # derive(): screen state from (model, state); count line
+           layout-fixed.js        # view 1 layout (existing behavior)
+           layout-adaptive.js     # [v2] adaptive grouping and card mode
+  ui/      app, header, left-panel (opening, search), combobox [v2], job-picker,
+           dot-grid (keyed renderer), dot, cards [v2], motion [v2], block-focus,
+           matrix, detail-panel (item, result list, Commission note), link-table,
+           methodology, legend, mobile-list, tooltip, dom
+  styles/  tokens.css base.css components.css
+tests/     unit (node:test) and e2e (Playwright + axe, dev only)
+scripts/   check-data.js
+docs/      BUILD_SPEC.md (this file)
+.github/workflows/deploy.yml
 ```
+
+Dev-only items (tests, scripts, `Claude/`, `wireframes/`, extra xlsx files) must not be served on the published site.
 
 ## 4. Data layer
 
 ### 4.1 Files and loading
-- Fetch `data/norms.csv`, `entities.csv`, `links.csv` at runtime with relative URLs. Parse with `d3-dsv` (`csvParse`, no auto-typing except `link_id` as integer).
-- Treat empty string as "absent" (e.g. empty `topic_secondary`). Do not convert to `null` in a way that changes counts.
-- `data/meta.json` (new, metadata only): `{ "version": null, "date": null, "source_report_version": null, "licence": null, "citation": null, "contact": null }`. The client fills it in. The UI renders `[DATE]`, `[CONTACT]` etc. as visible placeholders while values are `null`. Download buttons link to files in `data/`.
-- No third-party requests anywhere. Fonts and every dependency are self-hosted and committed (`fonts/`, `vendor/`).
+- Fetch `data/norms.csv`, `entities.csv`, `links.csv` at runtime by relative URL; parse with the vendored `d3-dsv`. Empty string = absent value (do not turn it into something that changes counts). Loaded rows are frozen.
+- `data/meta.json` (metadata only, not part of the client's dataset): `{ "version": null, "date": null, "source_report_version": null, "licence": null, "citation": null, "contact": null }`. The client fills it in. The UI shows `[DATE]`, `[CONTACT]` etc. as visible placeholders while `null`.
+- No third-party requests anywhere. Fonts and libraries are self-hosted.
 
 ### 4.2 Derived model (built once, immutable)
-```
-norms[]            from norms.csv (+ index by norm_id)
-entities[]         from entities.csv (+ index by entity_id)
-links[]            from links.csv, each with refs: norm, entity
-linksByNorm, linksByEntity, linksByTopicPrimary, linksByJobPrimary
-topics[]           distinct topic_primary values ∪ topic_secondary values
-jobs[]             distinct job_primary values ∪ job_secondary values (includes "Not specified")
-entityNormSummary  per entity: links per norm, distinct operationalizations per norm
-```
-Block and group order comes from `config.js` (see 4.4), not from data order.
+`norms`, `entities`, `links` (with refs to norm and entity), indexes by norm, entity, primary topic, primary job; distinct topic and job values (including "Not specified"); per-entity per-norm summaries.
 
 ### 4.3 Validation (fail loudly, never fix)
-`validate.js` returns a list of problems. In dev and CI any problem fails. In production the app shows a visible banner ("Data check failed: …") and still renders what it can. Checks:
-- every `links.norm_id` exists in norms; every `links.entity_id` exists in entities
-- `norms.orientation` ∈ {positive, prohibitive}
-- `entities.type` ∈ the four types
-- every topic and job value in links has a label in `config.js` (a missing label means the data changed; surface it, do not guess)
-- `link_id` unique
-- counts reported to console: links, norms, entities, per type
+Every link has a valid norm and entity; `orientation` ∈ {positive, prohibitive}; `type` ∈ the four types; every topic and job value has a label in `config.js`; `link_id` unique. Dev and CI fail on any problem; production shows a visible banner and renders what it can.
 
 ### 4.4 `config.js`
-- `TOPIC_ORDER` and short labels: Incident response and management → "Incident response"; Critical infrastructure → "Critical infra."; Stability and security → "Stability & security"; Supply chain security → "Supply chain"; Cybercrime and terrorism → "Cybercrime"; Vulnerability disclosure → "Vuln. disclosure"; Human rights and privacy → "Human rights".
-- `JOB_ORDER` and short labels: Incident manager; Threat analyst; Critical infrastructure actor → "Crit. infra. actor"; Diplomat; Criminal justice; Not specified.
-- Block layout order in the grid follows the wireframe masonry: column 1 Incident response, Human rights; column 2 Critical infrastructure, Supply chain; column 3 Stability and security, Cybercrime, Vulnerability disclosure. Implement as responsive masonry, ordered by link count descending as the fallback.
-- Colors and sizes (section 6).
+Short labels and order for topics and jobs, block order and colors. Topic short labels: Incident response · Critical infra. · Stability & security · Supply chain · Cybercrime · Vuln. disclosure · Human rights. Job short labels: Incident manager · Threat analyst · Crit. infra. actor · Diplomat · Criminal justice · Not specified. **[v2]** `CARD_THRESHOLD` (default 12) and animation durations also live here.
 
-### 4.5 Golden values (use as tests)
+### 4.5 Golden values (tests)
 | Query | Expected |
 |---|---|
-| Search `NIS2` | exact short-name hit: "NIS2 Directive (Directive 2022/2555)", 22 links, norms A B C F G H I J K (9 of 11); per norm A1 B3 C2 F1 G4 H1 I3 J5 K2. One more item mentions NIS2 in its name (Technical Implementation Guidance on Commission Implementing Regulation 2024/2690, 2 links) |
-| Search `ENISA` | one item, 18 links, norms A B C G H I J (7 of 11); per norm A2 B2 C1 G3 H1 I3 J6 |
-| Search `Commission` | 4 items: European Commission (Institutions, Norm I, 1 link); Commission Implementing Regulation amending Implementing Regulation 2015/1998… (Legislation, Norm G, 1); Commission Recommendation on guidelines on the export of cyber-surveillance items… (Policies, Norm E, 1); Technical Implementation Guidance on Commission Implementing Regulation 2024/2690… (Policies, Norms I and J, 2 links). Commission note shown |
+| Search `NIS2` | exact short-name hit: "NIS2 Directive (Directive 2022/2555)", 22 links, norms A B C F G H I J K; per norm A1 B3 C2 F1 G4 H1 I3 J5 K2. One other item names NIS2 (Technical Implementation Guidance on Commission Implementing Regulation 2024/2690, 2 links) |
+| Search `ENISA` | one item, 18 links, norms A B C G H I J; per norm A2 B2 C1 G3 H1 I3 J6 |
+| Search `Commission` | 4 items: European Commission (Institutions, Norm I, 1 link); Commission Implementing Regulation amending Implementing Regulation 2015/1998… (Legislation, G, 1); Commission Recommendation on guidelines on the export of cyber-surveillance items… (Policies, E, 1); Technical Implementation Guidance on Commission Implementing Regulation 2024/2690… (Policies, I and J, 2). Commission note shown |
 | Topic blocks (primary) | Incident response 54, Critical infrastructure 37, Stability and security 30, Supply chain 22, Cybercrime 20, Vulnerability disclosure 18, Human rights 15 |
-| Job lens counts, primary / primary+secondary | Incident manager 54/89, Threat analyst 40/40, Critical infrastructure actor 37/49, Diplomat 30/93, Criminal justice 20/26, Not specified 15/15 |
+| Job lens, primary / primary + secondary | Incident manager 54/89, Threat analyst 40/40, Critical infrastructure actor 37/49, Diplomat 30/93, Criminal justice 20/26, Not specified 15/15 |
 | Prohibitive norms | C, F, K (36 of 196 links) |
+| **[v2]** Norm totals | A 28, B 27, C 17, D 17, E 15, F 14, G 23, H 10, I 22, J 18, K 5 (sum 196) |
+| **[v2]** Topic = Stability and security, secondary included | 95 links (30 primary, 65 secondary). By norm, primary + secondary: A 24+4, B 4+5, C 2+15, D 0+4, E 0+2, F 0+12, G 0+15, H 0+8. Grouped by norm; no group for I, J, K |
+| **[v2]** Same, secondary excluded | 30 links: A 24, B 4, C 2 |
+| **[v2]** Item = EEAS (European External Action Service (EEAS), Institutions) | 8 links; norms A3 B2 C1 E1 F1 |
+| **[v2]** EEAS + Stability and security, secondary included | 8 links (6 primary: A3 B2 C1; 2 secondary: E1 F1). Card mode (8 ≤ 12). Group headers "n of N" with N = Norm links in the topic: A 3 of 28, B 2 of 9, C 1 of 17, E 1 of 2, F 1 of 12 |
+| **[v2]** EEAS + Stability, secondary excluded | 6 links: A3 B2 C1 |
+| **[v2]** Item = ENISA only | 18 links, dot mode (18 > 12). Group headers: A 2 of 28, B 2 of 27, C 1 of 17, G 3 of 23, H 1 of 10, I 3 of 22, J 6 of 18 |
 
-## 5. Matching logic (pure functions, fully unit-tested)
+## 5. Matching and layout logic (pure functions, fully unit-tested)
 
 ### 5.1 Criteria
-State holds optional criteria: `q` (search text), `norm`, `orientation`, `type`, `topic`, `job`. The job lens (5.2) and the "Job category" dropdown are the **same** `job` criterion. Matrix cell click sets `norm` plus `topic` (topic mode) or `job` (job mode).
+State holds optional criteria: `q` (text), `item` (a selected entity id), `norm`, `orientation`, `type`, `topic`, `job`. The job lens and the "Job category" dropdown are the same `job` criterion. Matrix cell click sets `norm` plus `topic` (topic mode) or `job` (job mode).
+**[v2]** `item` (a chosen entity) and `q` (text search) are distinct: picking a suggestion in the combobox sets `item`; typing and pressing Enter with no suggestion highlighted sets `q`.
 
-### 5.2 Per-link result
+### 5.2 Per-link status
 For each link compute `status`:
 - `default`: no criteria active
 - `full`: all active criteria satisfied, every topic/job criterion at **primary** level
-- `partial`: all active criteria satisfied, at least one topic/job criterion satisfied only via **secondary** (`topic_secondary` / `job_secondary`)
+- `partial`: all active criteria satisfied, at least one topic/job criterion satisfied only through the **secondary** value
 - `none`: any active criterion not satisfied
 
-Criteria details: `norm` equals `norm_id`; `orientation` from the link's norm; `type` from the link's entity; `topic`/`job` compared against primary, then secondary; `q` per 5.3.
+**[v2]** `includeSecondary` (default true): when false, a `partial` link is treated as `none`.
 
 ### 5.3 Search
-Searches entity `name`, `short_name`, `aliases` (split on `;`). Case- and diacritics-insensitive. A query token matches at the **start of a word** (not anywhere in a word: `cra` must not hit "democracy"). All tokens must match.
-Ranking and mode:
-1. If the normalized query equals an entity's `short_name` or one of its aliases exactly → **single-item mode** on that entity (it is selected, its dots highlighted). Other word-matches are listed under the panel as "N other item(s) mention '…'" (a link switches to list mode). Reason: the wireframes show NIS2 as a single selected item even though another item names it.
-2. Otherwise, all word-matching entities → if exactly 1: single-item mode; if 2 or more: **list mode** (result list in the right panel, all their dots highlighted); if 0: empty state ("No item matches '…'. Try a short name such as NIS2 or ENISA.").
-3. Commission rule: if the query contains the word "commission" (any case), show the Commission note (copy in `copy.json`) above the result list, in the panel and as a small helper line under the search box at all times ("The European Commission is not coded per norm. Why?", link to methodology section).
+Searches entity `name`, `short_name`, `aliases` (split on `;`). Case- and diacritics-insensitive. A query token matches at the **start of a word** (`cra` must not hit "democracy"). All tokens must match.
+1. If the normalized query equals an entity's `short_name` or an alias exactly → single-item mode on that entity; its dots are highlighted, other items that merely contain the word are listed as "N other item(s) mention '…'".
+2. Otherwise all word-matching entities → exactly 1: single-item mode; 2 or more: list mode (all their dots highlighted); 0: empty state ("No item matches '…'. Try a short name such as NIS2 or ENISA.").
+3. If the query contains the word "commission", show the Commission note above the result list. The helper line under the search box ("The European Commission is not coded per norm. Why?") is always visible.
+4. Results are listed alphabetically. If two items share an exact name, list mode is used. A query matching two short names (for example "CSA") shows list mode and selects nothing.
 
 ### 5.4 Aggregations
-- Block count: links by `topic_primary` (grid grouping is always by primary topic).
-- Block × norm: dots per norm inside a block; dot order inside a norm: type (Legislation, Policies, Institutions, Partnerships), then entity name.
-- Matrix cell: count of links for (norm, column value) at primary level. In job mode also the count at secondary level, shown as a lighter "+n". A cell is "hit" when at least one of its links has status `full` or `partial`.
-- Panel: links and distinct norms for an entity; per-norm link counts; distinct operationalizations per norm.
+Block count = links by `topic_primary`. Matrix cell = links for (norm, column value) at primary level; in job mode also the secondary count as a lighter "+n". Panel: links and distinct norms per entity; per-norm link counts; distinct operationalizations per norm. A cell is "hit" when at least one of its links is `full` or `partial`.
+
+### 5.5 [v2] Adaptive grouping rule
+`layout-adaptive.js` exposes `adaptiveLayout(links, criteria, options)` returning `{ mode: 'dots' | 'cards', groupBy, groups: [...] }`. Only links with status `full` or `partial` are laid out (unless `showNonMatching`, 5.8). The grouping dimension is the first of Topic → Norm → Type that is **not pinned** by a criterion:
+
+| What is chosen | Dots are grouped by |
+|---|---|
+| Nothing, or only type or norm type | Topic (as view 1, all dots) |
+| A topic or a job | Norm |
+| A topic (or job) and a norm | Type |
+| One item (alone or combined) | Norm; topic and job appear on each card or in the tooltip |
+
+Rules:
+- A "job" criterion pins the topic dimension (the grid stays topic-based; see the decision "job path = lens").
+- If a norm and an item are both chosen, group by Type; if everything is pinned (topic, norm, type), a single group is shown.
+- Groups with no links are not drawn. Group order: norms by letter; topics in `config.js` order; types Legislation, Policies, Institutions, Partnerships.
+- Within a group dots are ordered: `full` before `partial`, then type, then entity name.
+
+### 5.6 [v2] Ghost totals
+Each group header shows `n` (the group's visible links) and, when at least one criterion is active, `n of N`, where N = the number of links that group would hold **if the item and text criteria were ignored** (other criteria such as topic still apply). Examples: EEAS in Stability, Norm A: "3 of 28"; ENISA alone, Norm J: "6 of 18". When secondary matches are visible, the header of a topic-pinned view reads `primary + secondary` ("24 +4"). A count line above the view reads "k of 196 links" (and "p primary, s secondary" when secondary matches are shown).
+
+### 5.7 [v2] Card mode
+`mode = 'cards'` when the number of visible links is ≤ `CARD_THRESHOLD` (config, default 12, tune by eye). In card mode each link is a card: status dot, label ("Primary topic match" / "Secondary topic match", only when a topic or job criterion is active), the operationalization text in full, and chips: primary topic, secondary topic (if any), primary job, secondary job (if any). Partial cards use a dashed border. Above the threshold the same links are dots; hover or focus shows a tooltip with item name, type, norm, text and topic/job. When the item panel is open it stays the place for per-item totals.
+
+### 5.8 [v2] "Show non-matching dots"
+Checkbox in the left column, default off in view 2. When on, nothing leaves: the view uses the fixed layout of view 1 (topic blocks, same positions as the unfiltered state) with `none` dots faded. It is the escape hatch for readers who want context. In view 1 this checkbox does not exist (view 1 always shows all dots).
+
+### 5.9 [v2] Combobox
+One control replaces the search box: "Find an item". Suggestions come from entities, matched with the 5.3 word-prefix rule (name, short name, aliases), grouped by type (Legislation, Policies, Institutions, Partnerships) with a link count per row, and narrowed by the Type dropdown. The last row is "Show all N matches for '…' as a list". Choosing a suggestion sets `item` and shows a chip ("Item: EEAS", using the short name if there is one). Enter with nothing highlighted applies the text as `q`. With an empty query nothing is listed (type to search) unless the user presses ArrowDown, which opens the full grouped list (91 items, scrollable). ARIA: combobox pattern with a listbox popup and `aria-activedescendant`; group labels are `role="presentation"` headings.
 
 ## 6. Visual encoding
 
-Colors (tokens): Jet `#333333`, Electric Blue `#0033FF`, White, Sunglow `#FFCC33`; secondary Light sea green `#03A6A6`, Red `#F51B1B` used sparingly (errors, warnings; not for data encoding). Pale-blue "no match" is a tint of Electric Blue (start near `#B8C2FF`, tune for the wireframe look).
+Colors: Jet `#333333`, Electric Blue `#0033FF`, White, Sunglow `#FFCC33`; secondary Light sea green `#03A6A6`, Red `#F51B1B` (sparingly, never for data). Pale-blue "no match" is a tint of Electric Blue (about `#B8C2FF`).
 
 | Dot state | Encoding |
 |---|---|
 | `default` | Electric Blue fill |
-| `full` | Sunglow fill + 1.5px Jet outline |
-| `partial` | **Ring**: no fill (the background shows through), a Sunglow ring (about 3px) and thin Jet outline (owner decision 2026-11-11: no pale-blue fill). Must stay distinguishable from `full` and `none` at 12 px and in greyscale (decision: ring, not hatching) |
-| `none` | pale blue, no outline |
-| selected item | With no search or filter active: the item’s dots stay Electric Blue and every other dot dims to the `none` look. The clicked dot gets the black ring (as on hover). With a search or filter active: dots keep their match state and the item’s other dots get a thin ring. Tooltip state line: Selected / Linked (same item) / Not linked, or the match status (owner decision 2026-11-11) |
-| hovered/focused | 2px Jet outline plus tooltip |
+| `full` | Sunglow fill + Jet outline |
+| `partial` | **Ring**: pale-blue fill, Sunglow ring (about a sixth of the diameter), thin Jet outline. Distinguishable from `full` and `none` at 12 px and in greyscale |
+| `none` | pale blue, no outline (only drawn in view 1 or when "Show non-matching dots" is on) |
+| hover/focus | 2 px Jet outline plus tooltip |
 
 - Yellow means "matches current search or filter" and nothing else.
-- Norm tags: **DO** = outlined tag; **DON'T** = filled Jet tag. Prohibitive-norm groups also get a dark top edge. Never encoded by color alone.
-- Type badges in the panel: filled Electric Blue, white text (Legislation, Policies, Institutions, Partnerships).
-- Typography: Roboto Slab Bold 700 for title and H1; Roboto Light 300 for subtitles, H2 and body. Self-host woff2; `font-display: swap`; real fallback stacks (`Georgia, serif` / `system-ui, sans-serif`). Dark text on yellow. Body text must pass WCAG AA contrast (Light 300 at small sizes needs checking; if it fails, raise weight or size for UI text and record it in DECISIONS.md).
-- Dot diameter: about 16 to 20 px desktop, 12 to 14 px tablet; gap about 4 px. Dot size is a token.
-- Support light mode only in v1 (the brand is white-background). Respect `prefers-reduced-motion` (no animated transitions when set).
+- **DO** tag: outlined. **DON'T** tag: filled Jet, plus a dark top edge on prohibitive groups. Never carried by color alone.
+- Type badges: filled Electric Blue, white text. Chips in cards: tinted background, Roboto 300, no color meaning.
+- Typography: Roboto Slab Bold 700 for title and H1/H2, Roboto Light 300 for body. Small UI labels may use weight 400 if 300 fails AA contrast (record in `DECISIONS.md`). Self-hosted woff2.
+- Light mode only. Respect `prefers-reduced-motion`.
 
 ## 7. Layout and components
 
-Desktop wireframe layout: header; left column (about 300 px); main area; right panel (about 330 px) when something is selected.
+Desktop: header; left column (about 300 px); main area; right panel (about 340 px) when an item is selected.
+- **Header**: "norms tracker", tabs Explore / Methodology, links "Read the report" and "Download data".
+- **Left column**: intro text, "Explore by" toggle (Topic | Job), **[v2] combobox (5.9)**, dropdown filters (Norm, Norm type, Topic, Job category, Type), **[v2] checkboxes "Include secondary matches" (default on) and "Show non-matching dots" (default off, view 2 only)**, legend (entries depend on what is active: filled yellow = matches, ring = secondary match, blue = no filter, pale = non-match when shown, DO/DON'T tags), "One dot = one link between a norm and an item."
+- **Opening** (S0), **JobPicker**, **Matrix**, **DetailPanel**, **ResultList**, **CommissionNote**, **Methodology tab**: as in revision 1 and the view 1 wireframes. The matrix stays as the overview in both views; **[v2]** in view 2 cells outside the current selection grey out (greyed text must still pass contrast) and cells containing matches are yellow.
+- **Top bar [v2]**: active-filter chips (yellow, with remove buttons, e.g. "Item: EEAS", "Topic: Stability and security"), "Clear all", then the count line (5.6).
+- **DotGrid (both views)**: one keyed renderer (key = `link_id`) with two layout strategies: `layout-fixed` (view 1) and `layout-adaptive` (view 2). Do not build two apps.
+- **Cards [v2]**: 5.7. Cards sit under their group header in a wrapping grid (two columns at desktop width).
+- **BlockFocus**: stays in view 1. In view 2 it is not needed: card mode replaces drill-down.
 
-- **Header**: "norms tracker" (Roboto Slab Bold, Electric Blue), tabs Explore / Methodology, links "Read the report" and "Download data" (to the methodology download section).
-- **Left column**: intro text (`copy.json`, placeholder for now), "Explore by" toggle (Topic | Job), search input with helper line, dropdown filters (Norm, Norm type = All/Do/Don't, Topic, Job category, Type), legend, "One dot = one link between a norm and an item".
-- **Opening** (state S0): the two question cards ("How do the UN norms deal with specific issues?" → Start from topics; "How are the UN norms relevant for my job?" → Start from job categories), "You can switch at any time". The faded topic grid is visible behind/beside them (see wireframe 1).
-- **JobPicker** (visible when Explore by = Job): six chips, each showing primary and primary+secondary counts (e.g. "Diplomat 30 · 93"). "Not specified" is shown as a lighter chip with a note: no job category in the source (Norm E). Single select; selecting sets the `job` criterion. Clearing returns to the neutral grid.
-- **DotGrid**: blocks by primary topic (title, total count, norm groups). Each norm group: letter, DO/DON'T tag, short norm title (two lines max), dots. Clicking a block focuses it (**BlockFocus**, below).
-- **BlockFocus** (drill-down, interpretation of "norm › type › item"): block expands to full main width; norm groups, each split by type; each type lists its items as rows (name, link count in this norm). Breadcrumb: `All topics › Incident response › Norm B › Legislation`. Clicking an item selects it (opens the panel). Escape or breadcrumb goes up one level.
-- **Matrix** ("Norms by topic" / "Norms by job category" below the grid): 11 norm rows × topic or job columns, row label has DO/DON'T tag and truncated title with full title in a tooltip; clicking a cell sets `norm` plus column criterion; clicking again clears.
-- **DetailPanel** (single item): close button; type badge; full name; "N links across M of the 11 norms"; strip of 11 letters A to K (highlighted yellow when the item appears; prohibitive letters carry the dark top edge always); then the first three norms ordered by link count, ties by letter: "Norm J · DO · 6 links" plus the distinct operationalization texts (first one visible, "+n more" expands); "Show all M norms" expands the rest; then the description placeholder (from `copy.json`: "[Placeholder: short description of the item and link to the full report section]").
-- **ResultList** (several items): heading "N items match '…'"; one row per item (type badge, name, "n links · Norm X, Y"); click selects one. Commission note on top when relevant.
-- **Methodology tab**: section list on the left (anchor links), content in `copy.json`/markup, "To confirm" boxes (styled boxes, dashed "Draft for review" banner at top, both removable by one config flag `SHOW_DRAFT_MARKERS`), downloads (xlsx, three CSVs, CLEANING_LOG.md, clean_norms_data.R), version and contact (from `meta.json`).
+## 8. Views and states
 
-## 8. States
+Selected by `?view=1` (fixed) or `?view=2` (adaptive, the default since 2026-11-12). Both share the data layer, logic, panel, matrix, filters and methodology. Both are published on the same site so the client can compare.
 
-| # | State | Trigger | What the user sees |
-|---|---|---|---|
-| S0 | Opening | first load, no criteria | Two question cards, faded topic grid, no matrix, no panel |
-| S1 | Topic exploration | card 1, or Explore by = Topic | Full-colour topic grid (all `default`), matrix by topic, filters enabled |
-| S2 | Job lens | card 2, or Explore by = Job | Same topic grid and JobPicker. With a job chosen: `full` and `partial` dots (5.2), matrix by job with primary and "+secondary" counts, legend explains filled vs ring |
-| S3 | Search | text in search | Matching dots by status, non-matches `none`; right panel in single-item or list mode (5.3) |
-| S4 | Commission search | query contains "commission" | S3 plus the Commission note in the panel; expected 4 results (4.5) |
-| S5 | Selected item | click dot, row or result | DetailPanel; that entity's dots highlighted; works with any other active criteria |
-| S6 | Block focus | click a block | BlockFocus with breadcrumb; panel as S5 when an item is chosen |
-| S7 | Mobile | viewport below 720 px | See below |
+**View 1 states** (as revision 1): S0 opening, S1 topic exploration, S2 job lens, S3 search, S4 Commission search, S5 selected item, S6 block focus, S7 mobile.
 
-Combined filters apply together (5.2). A "Clear all" control resets every criterion and returns to S1 (or S0 on a fresh load); the active-filter chip(s) above the grid show what is applied and each has a remove button (wireframe: yellow "Search: ENISA ×").
+**View 2 states [v2]** (wireframe boards 1 to 6):
 
-**Mobile (S7)**: the dot grid is replaced by a drill-down list. Topics as cards (title, count, a small proportional bar split by norm); tap → norms (letter, DO/DON'T tag, title, count) → types → items → item detail as a full-screen sheet. Filters sit in a collapsible "Filter" sheet; search stays at the top. Matches are shown with the same encodings (yellow chip for `full`, ring chip for `partial`) plus a text label ("matches"/"secondary match"). Tablet (720 to 1100 px): two columns, panel as an overlay.
+| # | State | What the user sees |
+|---|---|---|
+| V1 | All dots | 196 dots in topic blocks, new left column, no chips |
+| V2 | Combobox open | suggestions grouped by type with link counts, "Show all N matches" row; dots unchanged |
+| V3 | Topic chosen | non-matches leave; survivors regroup by norm (primary filled, secondary rings); count line "95 of 196 links"; matrix columns grey out except the chosen topic |
+| V4 | Item + topic chosen | EEAS in Stability: 8 links as cards grouped by norm, headers "3 of 28" etc.; item panel open |
+| V5 | One item chosen | ENISA: 18 dots grouped by norm, tooltip on hover, item panel open |
+| V6 | Commission search | list mode with the Commission note; the four items' dots highlighted |
+| V7 | "Show non-matching dots" on | v1 fixed layout with faded non-matches |
+| V8 | Mobile | the drill-down list (as view 1) using the adaptive grouping, cards for small sets, no choreography beyond a 150 ms fade |
+
+Combined criteria apply together (5.2). "Clear all" returns to V1 (or S0 on a fresh load).
 
 ## 9. Interactions and URL
 
-- Hover or keyboard focus on a dot: tooltip with item name, type, norm label, operationalization text (truncated), topic and job.
-- Click a dot: select its item (S5). Click a block title: S6.
-- Search is debounced (150 ms); Enter selects the first result in list mode; Escape clears search or closes the panel.
-- All criteria and the selection live in one store and in the URL query string (shareable, iframe-safe, via `history.replaceState`): `?by=job&job=Diplomat&q=NIS2&norm=C&type=Legislation&item=<entity_id>&view=methodology`. Unknown values are ignored and logged to the console; invalid values never crash the page.
+- Hover or focus on a dot: tooltip (item name, type, norm label, text, topic, job). Click a dot or card: select its item. Click a group header in view 1: block focus.
+- Search is debounced (150 ms); Escape closes the combobox, then clears the text, then closes the panel.
+- All criteria and the selection live in one store and in the URL query string (shareable, iframe-safe, `history.replaceState`): `?view=2&by=job&job=Diplomat&q=NIS2&item=<entity_id>&norm=C&type=Legislation&topic=...&sec=0&non=1`. `sec=0` means secondary matches excluded, `non=1` means non-matching dots shown. View 2 is the default and is left out of the URL; the Methodology tab is `tab=methodology` (see `DECISIONS.md`). Unknown values are ignored and logged; invalid values never crash the page.
 - No cookies, no storage, no analytics.
 
 ## 10. Accessibility
 
-- Keyboard: tab order header → left column → grid → panel; arrow keys move within a norm group's dots; Enter selects; Escape closes.
-- The dot grid is a labelled group per block and per norm group (`role="group"`, `aria-label="Incident response, Norm B, do, 23 links"`); each dot is a focusable button with a full label. A visually hidden live region announces result counts ("22 links match NIS2 across 9 norms").
-- Text alternative for the visual: a "View as table" toggle shows the norm × topic/job matrix as a real `<table>` with headers and the item list (also the screen-reader path).
-- Every control has a visible label; contrast WCAG AA for text and UI components (dots in `none` state are intentionally de-emphasised but must keep a 3:1 boundary against the white background where they carry information; verify and record).
-- Color is never the only signal (tags, ring vs filled, text counts).
-- Test with axe (Playwright) on every state in section 8; zero serious/critical violations.
+- Keyboard: tab order header → left column → grid → panel; arrow keys move within a group's dots or cards; Enter selects; Escape closes.
+- Groups are labelled (`role="group"`, `aria-label="Incident response, Norm B, do, 23 links"`); each dot is a focusable button with a full label; each card is an `article` with its status in text.
+- **[v2]** A visually hidden live region announces the result after every change ("8 of 196 links match: item EEAS, topic Stability and security"). If the focused dot or card leaves, focus moves to its group header; if its group leaves, to the grid's heading.
+- "View as table" toggle shows the matrix as a real `<table>` and the visible links as a list (also the screen-reader path).
+- Every control has a visible label; WCAG AA for text and UI components. Dots in `none` state are intentionally de-emphasised; verify and record. Color is never the only signal (tags, ring vs filled, text counts, "Primary/Secondary topic match" labels on cards).
+- axe (Playwright) on every state in section 8: zero serious or critical violations.
 
-## 11. Build, test, deploy
+## 11. [v2] Motion
 
-- No build step, no bundler, no `dist/`. Vanilla JS (ES modules, relative imports), plain CSS, no framework.
-- Runtime dependencies are vendored, pinned and committed with their licence files: D3 as individual modules only, as unmodified ESM sources in `vendor/<module>@<version>/` (currently `d3-dsv@3.0.1` only). Add a library only if it clearly earns its place. Fonts are committed woff2 files in `fonts/`.
-- Dev-only tooling via npm (Node 20+): `@playwright/test`, `@axe-core/playwright`. `node_modules/` is gitignored; nothing from npm is served to the page.
-- Local preview: `npx serve .` (any static server works; fetch does not work over `file://`). No npm install is needed to run the site.
-- Scripts: `npm run test` (node:test unit tests on the pure modules), `npm run test:e2e` (Playwright + axe), `npm run check-data` (plain Node script).
-- CI (`.github/workflows/deploy.yml`): install, `check-data`, unit tests, e2e (once the UI exists), then publish the committed files as they are to GitHub Pages (Actions deploy of `git archive HEAD`, minus the dev-only paths marked `export-ignore` in `.gitattributes`). Deploy fails if data validation or tests fail.
-- Relative paths everywhere so it works at a subdomain root or a path. Iframe-friendly: no frame-busting, no fixed 100vh assumptions, `<meta name="viewport">` set.
-- Unit tests cover: loader, validation (with deliberately broken fixtures), matching statuses (primary/secondary/none, combined criteria), search ranking (NIS2 exact-hit rule, ENISA, Commission, "cra" not matching "democracy"), aggregates against the golden values (4.5), URL parse/serialise round-trip.
-- Data update flow: replace the three CSVs in `data/` (plus meta.json), run `npm run check-data`; no code change should be needed. Any new topic or job value fails the label check on purpose.
+- Every dot is keyed by `link_id`. When criteria change: dots that stay **move** to their new position; dots that leave **shrink and fade**; dots that enter **grow in**. When the mode changes from dots to cards (or back), dots expand into cards or cards collapse into dots at the same position.
+- Sequence, about half a second in total: leave 0 to 200 ms, regroup and move 200 to 600 ms, cards expand or enter 500 to 800 ms (tune by eye; keep the total short). Ease-out.
+- Implementation: no new dependency by default. Use FLIP (first, last, invert, play) with the Web Animations API or CSS transitions on transform and opacity. If that proves impractical, ask before vendoring `d3-transition` (it pulls in `d3-timer`, `d3-interpolate`, `d3-ease`, `d3-dispatch`, `d3-color`); record the decision either way.
+- `prefers-reduced-motion: reduce` → instant swap, no animation. Very large moves (more than about 150 dots) may fall back to a 150 ms cross-fade for performance; measure before deciding.
+- Never block interaction during animation: a new selection cancels the running one and animates from the current state.
 
-## 12. Changes to the wireframes (decisions from the planning chat)
+## 12. Build, test, deploy
 
-1. The "Group by Topic | Job" switch becomes "Explore by Topic | Job" and does **not** regroup the grid. Job path = lens on the same topic grid. Reason: primary job is fully determined by primary topic in the data, so a separate job grouping would show the same blocks.
-2. Secondary values are shown as **rings** (`partial`), primary as filled yellow (`full`). Applies to topic and job criteria alike. Legend gets a ring entry.
-3. Artboard 3 (explore by job) is replaced by S2: topic grid + JobPicker + job matrix.
-4. Methodology text to adjust: "secondary values count as matches when filtering" becomes "secondary values are shown as rings".
-5. Search: exact short-name or alias hit selects that single item (5.3); other mentions are linked below.
+- Plain static site: ES modules, no bundler, no `dist/`, no framework. Preview with any static server (for example `npx serve .`); `fetch` does not work over `file://`.
+- D3 is vendored (pinned, unmodified, with licences). Fonts are committed woff2. No npm package is served to the page; `node_modules` is for tests only.
+- Tests: unit with `node:test` on the pure modules in `src/logic/` and `src/data/`; e2e with Playwright and axe (dev only); `check-data` is a plain Node script.
+- CI workflow: `check-data`, unit tests, e2e against a local static server, then publish the committed files as they are. The build fails if data validation fails.
+- **[v2]** Add unit tests for: the adaptive grouping table (5.5), ghost totals (5.6), the card threshold boundary (12 vs 13), `includeSecondary` on and off, "Show non-matching dots", combobox suggestion grouping and Type narrowing, URL round-trip for the new parameters, and every v2 golden value in 4.5. Add e2e checks for transitions (the DOM after the animation settles equals the layout the logic returned; with reduced motion the end state is immediate).
+- Data update flow: replace the CSVs in `data/` (plus `meta.json`), run `check-data`; no code change needed. A new topic or job value fails the label check on purpose.
 
-## 13. Decisions log seed (`DECISIONS.md`)
-Four types kept (institutions and partnerships split, unlike the report). Norm E job = "Not specified". Topics (7) and jobs (5 + "Not specified") are the tracker's own coding, not the report's. Dots, not squares; gridded layout. Colors signal match state only (blue default, yellow match, pale blue no match; the blue/yellow alternation in the Flourish prototype had no meaning). Prohibitive norms C, F, K confirmed against the report text (footnotes on the do/don't split). European Commission not coded per norm, as in the report; explanation shown near search and on a Commission search. Job path = lens on the topic grid; secondary = ring. Data is read-only; problems are flagged, not fixed.
+## 13. Decisions to record in `DECISIONS.md` (seeds)
 
-## 14. Open items for the client (`OPEN-QUESTIONS.md` seed)
-1. Activity count: dataset has 63 norm-specific descriptions (59 distinct wordings); the report says 55. Four descriptions recur under different wording across norms (cyber-defence posture in A and F; international-law position in A and F; criminalization in C and D; critical infrastructure designation in F and G); merging them would give 55. Is that the rule, and can an activity ID per row be added?
-2. Norm A: the report lists 7 example activities but discusses the first two together; the dataset has 6. Which count is intended?
+Carried over: four types kept; Norm E job = "Not specified"; topics (7) and jobs (5 + "Not specified") are the tracker's own coding; dots, not squares; colors signal match state only; prohibitive norms C, F, K confirmed against the report text; European Commission not coded per norm; job path = lens on the topic grid, secondary = ring; data is read-only (problems are flagged, not fixed); static site, no Vite; vendored D3 and self-hosted fonts (no third-party requests).
+
+New in this revision:
+- View 2 is a second layout strategy and renderer mode, not a second app. View 1 stays available (`?view=1`) so the client can compare.
+- The grouping dimension adapts to what is pinned (5.5); few links become cards (5.7); the matrix stays as the overview.
+- "Item" is chosen with a combobox grouped by type; text search remains as `q`.
+- Secondary matches are shown as rings and can be switched off ("Include secondary matches", default on).
+- "Show non-matching dots" falls back to view 1's fixed layout with faded non-matches.
+- Motion: key by `link_id`, about half a second, FLIP without new dependencies, reduced motion = instant.
+- Ghost totals ("n of N") use N = group size with item and text criteria ignored.
+
+## 14. Open items for the client (`OPEN-QUESTIONS.md`)
+
+1. Activity count: 63 norm-specific descriptions (59 distinct wordings) vs 55 activities in the report. Four descriptions recur under different wording across norms (cyber-defence posture in A and F; international-law position in A and F; criminalization in C and D; critical infrastructure designation in F and G); merging them gives 55. Is that the rule? Can an activity ID per row be added?
+2. Norm A: the report lists 7 example activities but discusses the first two together; the data has 6.
 3. Topic and job coding: primary job is fully determined by primary topic on all 196 links. Who coded them and when? Were jobs derived from topics?
-4. Is "Stability and security" meant as a catch-all secondary topic (65 of 118 secondary-coded links)? It makes Diplomat relevant to 93 of 196 links.
+4. Is "Stability and security" a catch-all secondary topic (65 of 118 secondary-coded links)? It makes Diplomat relevant to 93 of 196 links.
 5. Norm E has no job category (intentional or missing?); links 103 and 104 have a secondary topic but no secondary job.
-6. Sign-off on the cleaning steps in CLEANING_LOG.md.
+6. Sign-off on the cleaning steps in CLEANING_LOG.md. Misspelled aliases (for example "EU-OSCE cooperaiton") remain in the data as supplied.
 7. Four types, or merge institutions and partnerships as in the report?
 8. Should the single Commission link (Norm I) stay?
 9. Report version the data follows; data cut-off date.
-10. Licence, citation, contact; intro text and item descriptions (placeholders in the UI).
+10. Licence, citation, contact; intro text and item descriptions (placeholders). Who fills in `meta.json`?
+11. Two items have short names "CSA (Solidarity)" and "CSA (Certification)": a search for "CSA" shows both in a list. Fine as is?
 
-## 15. Out of scope for v1
+## 15. Out of scope
 Member State measures; the report's external pathway (capacity building); implementation quality (the tracker shows alignment, not performance); dark mode; i18n; analytics; any backend.

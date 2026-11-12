@@ -52,9 +52,11 @@ export function blockNormDots(links, norms) {
  * primary: links with (norm, column) at primary level; secondary: at secondary level (shown as “+n” in job mode).
  * hit: at least one link of the cell (primary or secondary) has status full or partial.
  * hitLevel: 'full' when any of those links is full, else 'partial' when any is partial, else null.
+ * secondaryHits (default true): when false, only the links a cell counts at primary level can make it a hit
+ * (view 2, topic mode: the cell shows the primary count only, so its colour follows that number).
  * @returns Map<norm_id, Map<value, {primary, secondary, hit, hitLevel}>>
  */
-export function matrixCells(links, norms, columns, mode, statusFn = null) {
+export function matrixCells(links, norms, columns, mode, statusFn = null, { secondaryHits = true } = {}) {
   const field = mode === 'job' ? 'job' : 'topic';
   const out = new Map();
   for (const n of norms)
@@ -70,7 +72,7 @@ export function matrixCells(links, norms, columns, mode, statusFn = null) {
     const p = row.get(l[`${field}_primary`]);
     if (p) { p.primary += 1; mark(p, status); }
     const s = l[`${field}_secondary`] !== l[`${field}_primary`] ? row.get(l[`${field}_secondary`]) : undefined;
-    if (s) { s.secondary += 1; mark(s, status); }
+    if (s) { s.secondary += 1; if (secondaryHits) mark(s, status); }
   }
   return out;
 }

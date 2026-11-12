@@ -1,4 +1,4 @@
-// States S0–S7 (BUILD_SPEC 8): behaviour, golden values in the UI, and axe (zero serious/critical).
+// View 1 (?view=1) states S0–S7 (BUILD_SPEC 8): behaviour, golden values in the UI, and axe (zero serious/critical).
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
@@ -25,7 +25,7 @@ test.afterEach(async ({ page }) => {
 });
 
 test('S0 opening → S1 topic exploration', async ({ page }) => {
-  await page.goto('./');
+  await page.goto('./?view=1');
   await ready(page);
   await expect(page.getByRole('button', { name: /How do the UN norms deal with specific issues/ })).toBeVisible();
   await expect(page.locator('.matrix')).toHaveCount(0);
@@ -34,14 +34,14 @@ test('S0 opening → S1 topic exploration', async ({ page }) => {
   await expectNoSeriousAxe(page, 'S0');
 
   await page.getByRole('button', { name: /Start from topics/ }).click();
-  await expect(page).toHaveURL(/\?by=topic$/);
+  await expect(page).toHaveURL(/\?view=1&by=topic$/);
   await expect(page.getByRole('heading', { name: 'Norms by topic' })).toBeVisible();
   await expect(page.locator('button.dot[data-status="default"]')).toHaveCount(196);
   await expectNoSeriousAxe(page, 'S1');
 });
 
 test('S1 block counts are computed from the data', async ({ page }) => {
-  await page.goto('./?by=topic');
+  await page.goto('./?view=1&by=topic');
   await ready(page);
   const counts = await page.locator('.block').evaluateAll((blocks) =>
     Object.fromEntries(blocks.map((b) => [b.querySelector('.block__title-btn').textContent, Number(b.querySelector('.block__count').textContent)])));
@@ -54,7 +54,7 @@ test('S1 block counts are computed from the data', async ({ page }) => {
 });
 
 test('S2 job lens: chips, full vs ring, matrix by job', async ({ page }) => {
-  await page.goto('./');
+  await page.goto('./?view=1');
   await ready(page);
   await page.getByRole('button', { name: /Start from job categories/ }).click();
   await expect(page.getByRole('heading', { name: 'Norms by job category' })).toBeVisible();
@@ -70,7 +70,7 @@ test('S2 job lens: chips, full vs ring, matrix by job', async ({ page }) => {
 });
 
 test('S3 search NIS2: single item, 22 links across 9 norms, other mention', async ({ page }) => {
-  await page.goto('./?by=topic');
+  await page.goto('./?view=1&by=topic');
   await ready(page);
   await page.getByLabel('Search items or institutions').fill('NIS2');
   await expect(page.locator('#panel-title')).toHaveText('NIS2 Directive (Directive 2022/2555)');
@@ -88,7 +88,7 @@ test('S3 search NIS2: single item, 22 links across 9 norms, other mention', asyn
 });
 
 test('S3 search ENISA and the empty state', async ({ page }) => {
-  await page.goto('./?by=topic&q=ENISA');
+  await page.goto('./?view=1&by=topic&q=ENISA');
   await ready(page);
   await expect(page.locator('.panel__summary')).toHaveText('18 links across 7 of the 11 norms');
   await page.getByLabel('Search items or institutions').fill('zzzz');
@@ -97,7 +97,7 @@ test('S3 search ENISA and the empty state', async ({ page }) => {
 });
 
 test('S4 Commission search: 4 results and the note', async ({ page }) => {
-  await page.goto('./?by=topic&q=Commission');
+  await page.goto('./?view=1&by=topic&q=Commission');
   await ready(page);
   await expect(page.locator('#panel-title')).toHaveText('4 items match “Commission”');
   await expect(page.locator('.result-row')).toHaveCount(4);
@@ -110,7 +110,7 @@ test('S4 Commission search: 4 results and the note', async ({ page }) => {
 });
 
 test('S5 select a dot, Escape closes and returns focus', async ({ page }) => {
-  await page.goto('./?by=topic');
+  await page.goto('./?view=1&by=topic');
   await ready(page);
   const dot = page.locator('button.dot').first();
   await dot.click();
@@ -124,7 +124,7 @@ test('S5 select a dot, Escape closes and returns focus', async ({ page }) => {
 });
 
 test('selecting with no filter dims every other dot; with a filter the item gets a ring', async ({ page }) => {
-  await page.goto('./?by=topic&item=european-union-agency-for-cybersecurity-enisa');
+  await page.goto('./?view=1&by=topic&item=european-union-agency-for-cybersecurity-enisa');
   await ready(page);
   await expect(page.locator('button.dot[data-status="default"]')).toHaveCount(18);
   await expect(page.locator('button.dot[data-status="none"]')).toHaveCount(178);
@@ -137,7 +137,7 @@ test('selecting with no filter dims every other dot; with a filter the item gets
 });
 
 test('clicked dot gets the black ring; tooltip last line says selected / linked / not linked', async ({ page }) => {
-  await page.goto('./?by=topic');
+  await page.goto('./?view=1&by=topic');
   await ready(page);
   const tip = page.locator('.tooltip');
   const enisa = page.locator('button.dot[data-entity="european-union-agency-for-cybersecurity-enisa"]');
@@ -180,7 +180,7 @@ test('clicked dot gets the black ring; tooltip last line says selected / linked 
 });
 
 test('arrow keys move within a norm group', async ({ page }) => {
-  await page.goto('./?by=topic');
+  await page.goto('./?view=1&by=topic');
   await ready(page);
   const group = page.locator('.norm-group').first();
   const dots = group.locator('button.dot');
@@ -191,7 +191,7 @@ test('arrow keys move within a norm group', async ({ page }) => {
 });
 
 test('S6 block focus with breadcrumb; Escape goes up', async ({ page }) => {
-  await page.goto('./?by=topic');
+  await page.goto('./?view=1&by=topic');
   await ready(page);
   await page.getByRole('button', { name: /^Incident response and management, 54 links/ }).click();
   await expect(page.locator('.block-focus__title')).toContainText('Incident response and management');
@@ -207,7 +207,7 @@ test('S6 block focus with breadcrumb; Escape goes up', async ({ page }) => {
 });
 
 test('matrix cell sets norm and topic, second click clears', async ({ page }) => {
-  await page.goto('./?by=topic');
+  await page.goto('./?view=1&by=topic');
   await ready(page);
   const cell = page.getByRole('button', { name: /^Norm A \(do\), Stability and security: 24 links/ });
   await cell.click();
@@ -218,7 +218,7 @@ test('matrix cell sets norm and topic, second click clears', async ({ page }) =>
 });
 
 test('View as table is a real table with every link', async ({ page }) => {
-  await page.goto('./?by=topic&table=1&q=ENISA');
+  await page.goto('./?view=1&by=topic&table=1&q=ENISA');
   await ready(page);
   await expect(page.locator('.link-table tbody tr')).toHaveCount(196);
   await expect(page.locator('.link-table tbody tr[data-status="full"]')).toHaveCount(18);
@@ -228,27 +228,27 @@ test('View as table is a real table with every link', async ({ page }) => {
 test('URL: unknown values are ignored and logged, state round-trips', async ({ page }) => {
   const warnings = [];
   page.on('console', (m) => { if (m.type() === 'warning') warnings.push(m.text()); });
-  await page.goto('./?by=job&job=Astronaut&q=ENISA&bogus=1');
+  await page.goto('./?view=1&by=job&job=Astronaut&q=ENISA&bogus=1');
   await ready(page);
   await expect(page.locator('.panel__summary')).toHaveText('18 links across 7 of the 11 norms');
   expect(warnings.join('\n')).toMatch(/job="Astronaut"/);
   expect(warnings.join('\n')).toMatch(/bogus/);
-  await expect(page).toHaveURL(/\?by=job&q=ENISA$/);
+  await expect(page).toHaveURL(/\?view=1&by=job&q=ENISA$/);
 });
 
 test('Clear all resets criteria and keeps the starting point', async ({ page }) => {
-  await page.goto('./?by=job&job=Diplomat&q=CRA&type=Legislation');
+  await page.goto('./?view=1&by=job&job=Diplomat&q=CRA&type=Legislation');
   await ready(page);
   await page.getByRole('button', { name: 'Clear all' }).click();
-  await expect(page).toHaveURL(/\?by=job$/);
+  await expect(page).toHaveURL(/\?view=1&by=job$/);
   await expect(page.locator('button.dot[data-status="default"]')).toHaveCount(196);
 });
 
 test('Methodology: placeholders, computed counts, downloads', async ({ page, request }) => {
-  await page.goto('./?by=topic');
+  await page.goto('./?view=1&by=topic');
   await ready(page);
   await page.getByRole('link', { name: 'Download data' }).click();
-  await expect(page).toHaveURL(/view=methodology.*#download$/);
+  await expect(page).toHaveURL(/tab=methodology.*#download$/);
   await expect(page.locator('.meth-body')).toContainText('The tracker holds 196 links across the 11 norms and 91 items.');
   await expect(page.locator('#do-dont')).toContainText('the three prohibitive norms, C, F and K');
   await expect(page.locator('#version')).toContainText('[VERSION] · [DATE] · [CONTACT]');
@@ -263,7 +263,7 @@ test('Methodology: placeholders, computed counts, downloads', async ({ page, req
 test.describe('S7 mobile', () => {
   test.use({ viewport: { width: 390, height: 844 } });
   test('drill-down list with match labels, item sheet, no horizontal scroll', async ({ page }) => {
-    await page.goto('./?by=topic&job=Diplomat');
+    await page.goto('./?view=1&by=topic&job=Diplomat');
     await ready(page);
     await expect(page.locator('.dot-grid')).toHaveCount(0);
     const card = page.locator('.m-row', { hasText: 'Stability and security' });
@@ -280,7 +280,7 @@ test.describe('S7 mobile', () => {
     expect(sw).toBeLessThanOrEqual(390);
   });
   test('filters sit behind a toggle; search stays visible', async ({ page }) => {
-    await page.goto('./?by=topic');
+    await page.goto('./?view=1&by=topic');
     await ready(page);
     await expect(page.getByLabel('Search items or institutions')).toBeVisible();
     await expect(page.locator('#f-norm')).toBeHidden();
@@ -295,7 +295,7 @@ test('data problems show a banner and the app still renders', async ({ page }) =
     const body = (await res.text()).replace('Supply chain security', 'Quantum security');
     await route.fulfill({ response: res, body });
   });
-  await page.goto('./?by=topic');
+  await page.goto('./?view=1&by=topic');
   await ready(page);
   await expect(page.locator('#data-banner')).toBeVisible();
   await expect(page.locator('#data-banner')).toContainText('Quantum security');

@@ -52,7 +52,15 @@
     "typeLabel": "Type",
     "allTypes": "All types",
     "filterToggle": "Filter",
-    "clearAll": "Clear all"
+    "clearAll": "Clear all",
+    "findLabel": "Find an item",
+    "findPlaceholder": "Type a name, or pick from the list",
+    "findHint": "Type to search. Press the down arrow for the full list.",
+    "findShowAll": "Show all {n} matches for “{q}” as a list",
+    "findNoMatch": "No item matches “{q}”.",
+    "findListLabel": "Items",
+    "includeSecondary": "Include secondary matches",
+    "showNonMatching": "Show non-matching dots"
   },
   "legend": {
     "default": "Link (no search or filter)",
@@ -270,5 +278,58 @@
     "selectedSuffix": "selected",
     "linked": "Linked (same item)",
     "notLinked": "Not linked"
+  },
+  "legendV2": {
+    "full": "Matches your selection",
+    "partial": "Matches only via a secondary topic or job",
+    "default": "No filter applied",
+    "none": "No match (shown because “Show non-matching dots” is on)"
+  },
+  "countLine": {
+    "headingAll": "{total} links",
+    "heading": "{k} of {total} links",
+    "allShown": "All dots shown. Pick an item, topic, norm, job or type and the view narrows to what you chose.",
+    "empty": "No links match this combination. Remove a filter or use “Clear all”.",
+    "nonMatching": "All {total} links stay in their topic blocks. The ones that do not match are pale.",
+    "splitTopic": "{p} with this primary topic, {s} through a secondary topic (rings).",
+    "splitJob": "{p} with this primary job category, {s} through a secondary one (rings).",
+    "grouped": {
+      "topic": {
+        "default": "Grouped by topic."
+      },
+      "norm": {
+        "item": "Grouped by norm, because one item is chosen.",
+        "search": "Grouped by norm, because the search picks the items.",
+        "topic": "Dots regroup by norm because the topic is already chosen.",
+        "job": "Dots regroup by norm because the job category is already chosen.",
+        "default": "Grouped by norm."
+      },
+      "type": {
+        "item": "Grouped by type, because the item and the norm are already chosen.",
+        "search": "Grouped by type, because the search and the norm are already chosen.",
+        "job": "Grouped by type, because the job category and the norm are already chosen.",
+        "default": "Grouped by type, because the topic and the norm are already chosen."
+      },
+      "all": {
+        "default": "Topic, norm and type are all chosen, so the links form one group."
+      }
+    },
+    "cards": "{threshold} links or fewer, so each one opens into its text.",
+    "ghost": {
+      "item": "Group headers read “this item’s links of all links in the group”.",
+      "search": "Group headers read “these items’ links of all links in the group”.",
+      "default": "Group headers read “links shown of all links in the group”."
+    }
+  },
+  "cards": {
+    "primaryTopic": "Primary topic match",
+    "secondaryTopic": "Secondary topic match",
+    "primaryJob": "Primary job match",
+    "secondaryJob": "Secondary job match",
+    "match": "Matches",
+    "topic": "Topic: {v}",
+    "also": "Also: {v}",
+    "job": "Job: {v}",
+    "groupAll": "All chosen links"
   }
 }

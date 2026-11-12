@@ -8,11 +8,11 @@ export function createHeader(ctx) {
       "a",
       {
         class: "tab",
-        href: view === "explore" ? "./" : "?view=methodology",
+        href: view === "explore" ? "./" : "?tab=methodology",
         // Switch the view only: no scrolling, focus stays on the tab.
         onClick: (e) => {
           e.preventDefault();
-          store.set({ view });
+          store.set({ tab: view });
         },
       },
       copy.tabs[view],
@@ -36,7 +36,7 @@ export function createHeader(ctx) {
         href: "./",
         onClick: (e) => {
           e.preventDefault();
-          store.set({ view: "explore" });
+          store.set({ tab: "explore" });
         },
       },
       copy.title,
@@ -54,7 +54,7 @@ export function createHeader(ctx) {
       h(
         "a",
         {
-          href: "?view=methodology#download",
+          href: "?tab=methodology#download",
           onClick: (e) => {
             e.preventDefault();
             actions.goMethodology("download");
@@ -69,7 +69,7 @@ export function createHeader(ctx) {
     el,
     update(state) {
       for (const [view, a] of Object.entries(tabs)) {
-        if (state.view === view) a.setAttribute("aria-current", "page");
+        if (state.tab === view) a.setAttribute("aria-current", "page");
         else a.removeAttribute("aria-current");
       }
     },
