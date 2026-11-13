@@ -251,8 +251,7 @@ test('Methodology: placeholders, computed counts, downloads', async ({ page, req
   await expect(page).toHaveURL(/tab=methodology.*#download$/);
   await expect(page.locator('.meth-body')).toContainText('The tracker holds 196 links across the 11 norms and 91 items.');
   await expect(page.locator('#do-dont')).toContainText('the three prohibitive norms, C, F and K');
-  await expect(page.locator('#version')).toContainText('Version 1.0 · 16 Nov 2026 · patryk@digilateral.eu');
-  await expect(page.locator('#version a[href="mailto:patryk@digilateral.eu"]')).toBeVisible();
+  await expect(page.locator('#version')).toContainText('Version 1.0 · 16 Nov 2026 · Dr Patryk Pawlak | Digilateral');
   await expect(page.locator('.draft-banner')).toBeVisible();
   await expect(page.locator('body')).not.toContainText('[?]');
   for (const href of await page.locator('.downloads a').evaluateAll((as) => as.map((a) => a.getAttribute('href')))) {

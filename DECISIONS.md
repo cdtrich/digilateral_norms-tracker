@@ -75,4 +75,4 @@
 ## Title and metadata (2026-11-13)
 
 - **Title** (owner): “Cyber norms tracker: European Union”, in `copy.title` (header, page heading for screen readers) and the `<title>` in `index.html`. The header fits on one line at desktop width and wraps cleanly on mobile.
-- **`data/meta.json`** (owner): version `1.0` (first published release; the data file is `norms_tracker_data_v1.xlsx`), date `16 Nov 2026`, contact `patryk@digilateral.eu`, shown on the methodology tab as “Version 1.0 · 16 Nov 2026 · patryk@digilateral.eu”. The contact is a mailto link. `source_report_version`, `licence` and `citation` stay null (visible placeholders).
+- **`data/meta.json`** (owner): version `1.0` (first published release; the data file is `norms_tracker_data_v1.xlsx`), date `16 Nov 2026`, contact “Dr Patryk Pawlak | Digilateral” (owner edit), shown on the methodology tab as “Version 1.0 · 16 Nov 2026 · Dr Patryk Pawlak | Digilateral”. A contact that is an email address would become a mailto link; this one is plain text. `source_report_version`, `licence` and `citation` stay null (visible placeholders).
