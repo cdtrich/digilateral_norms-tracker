@@ -46,7 +46,7 @@
 - **URL keys** beyond the spec’s example: `orientation`, `topic`, `block`, `bnorm`, `btype` (block drill-down), `all` (show every item that mentions the query) and `table` (View as table).
 - **Typography:** only Roboto 300 and Roboto Slab 700 are shipped. Jet on white is 12.6:1, so Light 300 passes AA; small text is at least 13px. DO/DON’T tags use Roboto Slab 700.
 - **Methodology copy** is transcribed from wireframe 5 into `copy.json`. Every count from the data is a `{token}` computed in `methodologyFacts` (unknown tokens render as a visible “[?]”). Counts that come from the report or the cleaning log (55 activities, 100 name variants, two re-typed links) stay as written. The only wording change is BUILD_SPEC 12.4 (“secondary values are shown as rings”).
-- **Report link:** `copy.header.reportUrl` is null, so “Read the report [link to the report]” shows as a visible placeholder in the header and the Source section.
+- **Report link:** `copy.header.reportUrl` is https://www.interface-eu.org/publications/how-the-eu-implements-the-un-cyber-norms (owner, 2026-11-13). It opens in a new tab (`rel="noopener"`), so it also works when the tracker is embedded in an iframe. While the URL is null, “Read the report [link to the report]” shows as a placeholder.
 - **Mobile (S7):** the topic list is ordered by link count; the matrix stays available in a horizontal scroll box.
 - **Text alternative:** the matrix is always a real `<table>`; “View as table” replaces the dots with a table of all links and their match status.
 - **Playwright artefacts** go to the system temp folder (`playwright.config.js`), because OneDrive locks `test-results/`.
@@ -71,3 +71,8 @@
 - **Mobile (V8):** the adaptive groups become rows that open in place (topic › norm › cards); small sets are cards straight away; a 150 ms fade on change. Which rows are open is UI-only (not in the URL).
 - **“View as table” in view 2** lists the visible links only (all links with “Show non-matching dots”).
 - **Repo vs spec (section 3):** `src/logic/view.js` holds `derive` (the screen state) and the count line; the opening, result list and Commission note live in `left-panel.js` and `detail-panel.js` as before; new UI modules are `combobox.js`, `cards.js`, `motion.js`. `vendor/` holds `d3-dsv` only.
+
+## Title and metadata (2026-11-13)
+
+- **Title** (owner): “Cyber norms tracker: European Union”, in `copy.title` (header, page heading for screen readers) and the `<title>` in `index.html`. The header fits on one line at desktop width and wraps cleanly on mobile.
+- **`data/meta.json`** (owner): version `1.0` (first published release; the data file is `norms_tracker_data_v1.xlsx`), date `16 Nov 2026`, contact `patryk@digilateral.eu`, shown on the methodology tab as “Version 1.0 · 16 Nov 2026 · patryk@digilateral.eu”. The contact is a mailto link. `source_report_version`, `licence` and `citation` stay null (visible placeholders).

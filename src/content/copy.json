@@ -1,13 +1,13 @@
 {
   "_note": "UI copy. Text in [brackets] is a placeholder for the client. {tokens} are filled from the data (src/logic/aggregate.js methodologyFacts) and must never be replaced by typed numbers.",
-  "title": "norms tracker",
+  "title": "Cyber norms tracker: European Union",
   "tabs": {
     "explore": "Explore",
     "methodology": "Methodology"
   },
   "header": {
     "readReport": "Read the report",
-    "reportUrl": null,
+    "reportUrl": "https://www.interface-eu.org/publications/how-the-eu-implements-the-un-cyber-norms",
     "reportUrlPlaceholder": "[link to the report]",
     "downloadData": "Download data"
   },

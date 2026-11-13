@@ -17,9 +17,9 @@
 
 11. ~~**Two items share the short name “CSA”.**~~ Resolved (owner, 2026-11-11): listing both is fine. Cyber Solidarity Act has `short_name` “CSA (Solidarity)” and the Cybersecurity Act has “CSA (Certification)”. A search for “CSA” therefore lists both (list mode) and selects neither. Is that intended, or should one of them carry “CSA” as an alias?
 12. **Aliases include pre-cleaning misspellings** (owner raises with the client; data stays as is) (e.g. “EU-OSCE cooperaiton”, “Network Code … ((Delegated Regulation 2024/1366)”), matching the merges in CLEANING_LOG.md. They are searchable, which is harmless. Confirm they are meant to stay as aliases.
-13. **`meta.json` is new** (stays null; the client fills it in) (`data/meta.json`, all values null). Who fills in version, date, report version, licence, citation and contact?
+13. **`meta.json`:** version, date and contact filled in (owner, 2026-11-13); `source_report_version`, `licence` and `citation` are still open. Was: **`meta.json` is new** (stays null; the client fills it in) (`data/meta.json`, all values null). Who fills in version, date, report version, licence, citation and contact?
 14. **Methodology, “What it shows”** still says “Dots are grouped by topic or by job category, depending on the starting point.” Since BUILD_SPEC 12.1 the dots are always grouped by topic and the job path is a lens. Proposed wording for the authors: “Dots are always grouped by topic; choosing a job category highlights the links that matter for it.”
-15. **Report URL** for “Read the report” (header and Source section). Set `header.reportUrl` in `src/content/copy.json`.
+15. ~~**Report URL**~~ Resolved (owner, 2026-11-13): https://www.interface-eu.org/publications/how-the-eu-implements-the-un-cyber-norms, in `copy.header.reportUrl`.
 16. **UI microcopy to review** (functional labels written during the build, all in `copy.json`): legend lines (“Link (no search or filter)”, “Matches through a secondary topic or job”), job picker heading and count explanation, matrix “+n” explanation, “View as table”, “Escape” hint, mobile match labels, panel “Show less / Show fewer norms”.
 
 ## Raised while building view 2 (2026-11-12)

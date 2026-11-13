@@ -10,7 +10,7 @@ export function createMethodology(ctx) {
 
   // {reportLink} becomes a real link when copy.header.reportUrl is set, else a visible placeholder.
   const reportLink = () => copy.header.reportUrl
-    ? h('a', { href: copy.header.reportUrl }, copy.header.readReport)
+    ? h('a', { href: copy.header.reportUrl, target: '_blank', rel: 'noopener' }, copy.header.readReport)
     : h('span', { class: 'placeholder' }, `${copy.header.readReport} ${copy.header.reportUrlPlaceholder}`);
   const para = (text) => {
     const parts = fmt(text, facts).split('{reportLink}');
@@ -21,7 +21,8 @@ export function createMethodology(ctx) {
 
   const meta = model.meta ?? {};
   const metaLine = ['version', 'date', 'contact']
-    .map((k) => (meta[k] == null ? h('span', { class: 'placeholder' }, META_PLACEHOLDER[k]) : (k === 'version' ? `Version ${meta[k]}` : meta[k])));
+    .map((k) => (meta[k] == null ? h('span', { class: 'placeholder' }, META_PLACEHOLDER[k]) : (k === 'version' ? `Version ${meta[k]}`
+      : k === 'contact' && /^[^\s@]+@[^\s@]+$/.test(meta[k]) ? h('a', { href: `mailto:${meta[k]}` }, meta[k]) : meta[k])));
 
   const sections = m.sections.map((s) =>
     h('section', { class: 'meth-section', id: s.id, 'aria-labelledby': `${s.id}-h` },

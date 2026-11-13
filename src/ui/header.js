@@ -19,7 +19,7 @@ export function createHeader(ctx) {
     );
   const tabs = { explore: tab("explore"), methodology: tab("methodology") };
   const report = copy.header.reportUrl
-    ? h("a", { href: copy.header.reportUrl }, copy.header.readReport)
+    ? h("a", { href: copy.header.reportUrl, target: "_blank", rel: "noopener" }, copy.header.readReport)
     : h(
         "span",
         { class: "placeholder" },
