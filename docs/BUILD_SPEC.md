@@ -166,7 +166,7 @@ Colors: Jet `#333333`, Electric Blue `#0033FF`, White, Sunglow `#FFCC33`; second
 ## 7. Layout and components
 
 Desktop: header; left column (about 300 px); main area; right panel (about 340 px) when an item is selected.
-- **Header**: "norms tracker", tabs Explore / Methodology, links "Read the report" and "Download data".
+- **Header**: "Cyber norms tracker: European Union" (title in `copy.json`), tabs Explore / Methodology, links "Read the report" and "Download data".
 - **Left column**: intro text, "Explore by" toggle (Topic | Job), **[v2] combobox (5.9)**, dropdown filters (Norm, Norm type, Topic, Job category, Type), **[v2] checkboxes "Include secondary matches" (default on) and "Show non-matching dots" (default off, view 2 only)**, legend (entries depend on what is active: filled yellow = matches, ring = secondary match, blue = no filter, pale = non-match when shown, DO/DON'T tags), "One dot = one link between a norm and an item."
 - **Opening** (S0), **JobPicker**, **Matrix**, **DetailPanel**, **ResultList**, **CommissionNote**, **Methodology tab**: as in revision 1 and the view 1 wireframes. The matrix stays as the overview in both views; **[v2]** in view 2 cells outside the current selection grey out (greyed text must still pass contrast) and cells containing matches are yellow.
 - **Top bar [v2]**: active-filter chips (yellow, with remove buttons, e.g. "Item: EEAS", "Topic: Stability and security"), "Clear all", then the count line (5.6).
